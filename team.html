@@ -8,25 +8,43 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 <link rel="preload" as="image" href="./LOGO.png">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0a3d62;--ground:#1e3799;--card:rgba(255,255,255,.96);--accent:#f39c12;--text:#0d1b2a;}
+  :root{--bg:#1bddff;--ground:#2e7d32;--card:rgba(255,255,255,.94);--orange:#ff8c00;--text:#1a1a1a;--dark:#0d2b3e;}
   *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent;}
-  html,body{background:var(--bg);min-height:100vh;overflow-x:hidden;color:var(--text);user-select:none;-webkit-user-select:none;}
+  html,body{background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;user-select:none;-webkit-user-select:none;}
   input,textarea,select{user-select:text;-webkit-user-select:text;}
   img{-webkit-user-drag:none;pointer-events:none;}
-  #sky{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,#0a3d62,#1e3799 55%,#3c6382);}
+
+  #sky{position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(circle at 20% 20%, #fff6 0 4px, transparent 5px),
+      radial-gradient(circle at 70% 40%, #fff6 0 6px, transparent 7px),
+      radial-gradient(circle at 40% 70%, #fff4 0 3px, transparent 4px),
+      radial-gradient(circle at 85% 15%, #fff5 0 5px, transparent 6px),
+      linear-gradient(180deg, #1bddff 0%, #45e3ff 60%, #a8f0ff 100%);
+    background-size:200px 200px,300px 300px,150px 150px,250px 250px,100% 100%;
+    will-change:transform;}
+  #clouds{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:
+      radial-gradient(ellipse 80px 30px at 15% 15%, #fff, transparent 70%),
+      radial-gradient(ellipse 100px 35px at 60% 25%, #fff, transparent 70%),
+      radial-gradient(ellipse 70px 25px at 35% 45%, #fff, transparent 70%);
+    opacity:.55;will-change:transform;}
   #ground{position:fixed;bottom:0;left:0;width:100%;height:120px;z-index:-1;background:var(--ground);
-    box-shadow:inset 0 6px 0 #0c2461,inset 0 -10px 0 #061a40;
-    background-image:repeating-linear-gradient(90deg,#1e3799 0 40px,#152a78 40px 80px);}
+    box-shadow:inset 0 6px 0 #1b5e20,inset 0 -10px 0 #1b3d12;
+    background-image:repeating-linear-gradient(90deg,#2e7d32 0 40px,#276b2b 40px 80px);}
+
   header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;
-    background:rgba(0,0,0,.45);backdrop-filter:blur(6px);border-bottom:4px solid #000;
+    background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border-bottom:4px solid #000;
     position:sticky;top:0;z-index:50;}
   .brand-wrap{display:flex;align-items:center;gap:12px;}
-  .logo{height:46px;image-rendering:pixelated;pointer-events:none;}
-  .brand-title{font-family:'Press Start 2P',monospace;font-size:0.9em;color:#fff;
-    text-shadow:2px 2px 0 #000,3px 3px 0 var(--accent);letter-spacing:1px;line-height:1.3;}
+  .logo{height:46px;image-rendering:pixelated;}
+  .brand-title{font-family:'Press Start 2P',monospace;font-size:.9em;color:#fff;
+    text-shadow:2px 2px 0 #000,4px 4px 0 #ff8c00;letter-spacing:1px;line-height:1.3;
+    -webkit-font-smoothing:none;}
   .user-info{display:flex;align-items:center;gap:12px;color:#fff;font-weight:700;font-size:.9em;}
+
   .container{max-width:820px;margin:0 auto;padding:18px;}
   .card{background:var(--card);border:4px solid #000;border-radius:12px;padding:18px;margin-bottom:16px;
     box-shadow:6px 6px 0 rgba(0,0,0,.35);}
@@ -37,8 +55,8 @@
     background:#fff;color:#000;box-shadow:3px 3px 0 #000;transition:transform .06s;}
   .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000;}
   .btn:disabled{opacity:.6;cursor:wait;}
-  .btn-primary{background:#1e3799;color:#fff;}
-  .btn-warn{background:var(--accent);color:#fff;}
+  .btn-primary{background:var(--ground);color:#fff;}
+  .btn-warn{background:var(--orange);color:#fff;}
   .pill{display:inline-block;padding:3px 9px;border-radius:12px;background:#e0f7fa;border:2px solid #000;
     font-size:.78em;font-weight:700;margin:2px 4px 2px 0;}
   .pill.absent{background:#ffcdd2;}
@@ -52,17 +70,32 @@
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .empty{color:#666;font-style:italic;font-size:.9em;}
   .err{color:#c00;font-weight:700;}
-  .banner{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;text-shadow:1px 1px 0 #000;
+  .ok{color:#2e7d32;font-weight:700;}
+  .banner{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;text-shadow:1px 1px 0 #000;
     padding:14px 18px;border:4px solid #000;border-radius:12px;box-shadow:6px 6px 0 rgba(0,0,0,.35);margin-bottom:16px;
     display:flex;align-items:center;gap:14px;}
   .team-dp{width:64px;height:64px;border:3px solid #000;border-radius:10px;image-rendering:pixelated;background:#fff;}
   .banner h2{font-size:1.1em;}
   .banner .sub{font-size:.85em;opacity:.95;}
-  @media(max-width:600px){.brand-title{font-size:.62em;} .container{padding:12px;} .grid2{grid-template-columns:1fr;} .logo{height:38px;}}
+
+  #snakeOverlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;flex-direction:column;
+    justify-content:center;align-items:center;z-index:200;padding:10px;}
+  #snakeOverlay.show{display:flex;}
+  #snakeCanvas{background:#111;border:4px solid var(--orange);max-width:90vw;max-height:60vh;touch-action:none;}
+  .game-label{color:#fff;font-family:'Courier New',monospace;margin-bottom:8px;font-size:1em;text-align:center;}
+  .game-score{color:var(--orange);font-family:'Courier New',monospace;font-size:1.3em;font-weight:900;margin-bottom:6px;}
+  .game-hint{color:#aaa;font-size:.82em;margin-top:10px;text-align:center;}
+
+  @media(max-width:600px){
+    .brand-title{font-size:.7em;} .logo{height:38px;}
+    .container{padding:12px;} .grid2{grid-template-columns:1fr;}
+  }
 </style>
 </head>
 <body>
+
 <div id="sky"></div>
+<div id="clouds"></div>
 <div id="ground"></div>
 
 <header>
@@ -80,7 +113,10 @@
 <div class="container">
   <div class="banner">
     <img id="teamDP" class="team-dp" alt="">
-    <div><h2 id="teamTitle">Team</h2><div class="sub" id="teamSub"></div></div>
+    <div>
+      <h2 id="teamTitle">Team</h2>
+      <div class="sub" id="teamSub"></div>
+    </div>
   </div>
 
   <div class="card">
@@ -111,105 +147,267 @@
   </div>
 </div>
 
+<div id="snakeOverlay">
+  <div class="game-label">🎓 Loading…</div>
+  <div class="game-score">Score: <span id="snakeScore">0</span></div>
+  <canvas id="snakeCanvas" width="360" height="360"></canvas>
+  <div class="game-hint">Arrow keys (PC) · Swipe (Mobile)</div>
+</div>
+
 <script>
-/* ========== LOCKDOWN ========== */
 (function lockDown(){
-  document.addEventListener('contextmenu', e => e.preventDefault(), { capture:true });
-  document.addEventListener('keydown', e => {
-    const k = (e.key || '').toUpperCase();
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, {capture:true});
+  document.addEventListener('keydown', function(e){
+    var k = (e.key || '').toUpperCase();
     if (k === 'F12') { e.preventDefault(); return false; }
-    if (e.ctrlKey && e.shiftKey && ['I','J','C','K','M'].includes(k)) { e.preventDefault(); return false; }
-    if (e.ctrlKey && ['U','S','P','A'].includes(k) && !(k === 'A' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA'))) {
-      e.preventDefault(); return false;
-    }
-    if (e.metaKey && e.altKey && ['I','J','C','U'].includes(k)) { e.preventDefault(); return false; }
-  }, { capture:true });
-  document.addEventListener('dragstart', e => e.preventDefault(), { capture:true });
-  document.addEventListener('selectstart', e => {
-    const t = e.target.tagName;
+    if (e.ctrlKey && e.shiftKey && ['I','J','C','K','M'].indexOf(k) !== -1) { e.preventDefault(); return false; }
+    if (e.ctrlKey && ['U','S','P'].indexOf(k) !== -1) { e.preventDefault(); return false; }
+  }, {capture:true});
+  document.addEventListener('dragstart', function(e){ e.preventDefault(); }, {capture:true});
+  document.addEventListener('selectstart', function(e){
+    var t = e.target.tagName;
     if (t !== 'INPUT' && t !== 'TEXTAREA') e.preventDefault();
-  }, { capture:true });
+  }, {capture:true});
 })();
 
-const API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
-const $ = id => document.getElementById(id);
-let user = null;
+window.addEventListener('scroll', function(){
+  var y = window.pageYOffset;
+  document.getElementById('sky').style.transform = 'translateY(' + (y * 0.35) + 'px)';
+  document.getElementById('clouds').style.transform = 'translateY(' + (y * 0.6) + 'px)';
+}, {passive:true});
 
-function pad(n){return String(n).padStart(2,'0');}
-function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
-function yesterdayStr(){const d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
+var $ = function(id){ return document.getElementById(id); };
+var user = null;
 
-async function api(action, payload) {
-  payload = payload || {};
-  const res = await fetch(API_URL, {
-    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body: JSON.stringify(Object.assign({action}, payload)), redirect:'follow', cache:'no-store'
-  });
-  if (!res.ok) throw new Error('HTTP '+res.status);
-  return res.json();
+/* ---------- SNAKE LOADER ---------- */
+var snakeTick = null, snakeKeyHandler = null;
+function showSnake(){
+  $('snakeOverlay').classList.add('show');
+  startSnake();
 }
-function logout(){ localStorage.removeItem('aci_user'); sessionStorage.removeItem('aci_team_user'); location.href='index.html'; }
-function debounce(fn, ms) { let t; return function(){ const a=arguments,c=this; clearTimeout(t); t=setTimeout(()=>fn.apply(c,a), ms); }; }
+function hideSnake(){
+  $('snakeOverlay').classList.remove('show');
+  if (snakeTick) { clearInterval(snakeTick); snakeTick = null; }
+  if (snakeKeyHandler) { document.removeEventListener('keydown', snakeKeyHandler); snakeKeyHandler = null; }
+}
+function startSnake(){
+  var canvas = $('snakeCanvas');
+  var ctx = canvas.getContext('2d');
+  var GRID = 18;
+  var SIZE = canvas.width / GRID;
+  var codes = ['1','2','3','4','5','6','7','8'];
+  var imgs = codes.map(function(c){ var i = new Image(); i.src = './' + c + '.png'; return i; });
 
-window.addEventListener('load', () => {
-  const saved = sessionStorage.getItem('aci_team_user') || localStorage.getItem('aci_user');
-  if (!saved) { location.href = 'index.html'; return; }
-  try { user = JSON.parse(saved); } catch (e) { location.href='index.html'; return; }
+  var state = {
+    snake: [{x:9,y:9},{x:8,y:9},{x:7,y:9}],
+    dir: {x:1,y:0},
+    food: {x:13,y:9,idx:0},
+    score: 0, over: false
+  };
+  function placeFood(){
+    var attempts = 0;
+    do {
+      state.food.x = Math.floor(Math.random() * GRID);
+      state.food.y = Math.floor(Math.random() * GRID);
+      state.food.idx = (state.food.idx + 1) % imgs.length;
+      attempts++;
+    } while (state.snake.some(function(s){ return s.x === state.food.x && s.y === state.food.y; }) && attempts < 50);
+  }
+  function draw(){
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#1f1f1f';
+    for (var i = 0; i <= GRID; i++){
+      ctx.beginPath(); ctx.moveTo(i*SIZE, 0); ctx.lineTo(i*SIZE, canvas.height); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, i*SIZE); ctx.lineTo(canvas.width, i*SIZE); ctx.stroke();
+    }
+    state.snake.forEach(function(s, i){
+      ctx.fillStyle = (i === 0) ? '#ff8c00' : '#2e7d32';
+      ctx.fillRect(s.x*SIZE+1, s.y*SIZE+1, SIZE-2, SIZE-2);
+      ctx.strokeStyle = '#000';
+      ctx.strokeRect(s.x*SIZE+1, s.y*SIZE+1, SIZE-2, SIZE-2);
+    });
+    var img = imgs[state.food.idx];
+    if (img.complete && img.naturalWidth){
+      ctx.drawImage(img, state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
+    } else {
+      ctx.fillStyle = '#ff8c00';
+      ctx.fillRect(state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
+    }
+    ctx.strokeStyle = '#ff8c00';
+    ctx.strokeRect(state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
+    $('snakeScore').textContent = state.score;
+  }
+  function step(){
+    if (state.over) return;
+    var head = { x: state.snake[0].x + state.dir.x, y: state.snake[0].y + state.dir.y };
+    if (head.x < 0 || head.y < 0 || head.x >= GRID || head.y >= GRID ||
+        state.snake.some(function(s){ return s.x === head.x && s.y === head.y; })){
+      state.over = true;
+      setTimeout(function(){
+        state.snake = [{x:9,y:9},{x:8,y:9},{x:7,y:9}];
+        state.dir = {x:1,y:0}; state.score = 0; state.over = false;
+        placeFood();
+      }, 800);
+      return;
+    }
+    state.snake.unshift(head);
+    if (head.x === state.food.x && head.y === state.food.y){ state.score++; placeFood(); }
+    else state.snake.pop();
+    draw();
+  }
+  snakeKeyHandler = function(e){
+    var k = e.key;
+    if (k === 'ArrowUp'    && state.dir.y === 0) state.dir = {x:0,y:-1};
+    if (k === 'ArrowDown'  && state.dir.y === 0) state.dir = {x:0,y:1};
+    if (k === 'ArrowLeft'  && state.dir.x === 0) state.dir = {x:-1,y:0};
+    if (k === 'ArrowRight' && state.dir.x === 0) state.dir = {x:1,y:0};
+    if (k.indexOf('Arrow') === 0) e.preventDefault();
+  };
+  document.addEventListener('keydown', snakeKeyHandler);
+  var tsX = 0, tsY = 0;
+  canvas.addEventListener('touchstart', function(e){
+    tsX = e.touches[0].clientX; tsY = e.touches[0].clientY;
+  }, {passive:true});
+  canvas.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - tsX;
+    var dy = e.changedTouches[0].clientY - tsY;
+    if (Math.abs(dx) > Math.abs(dy)){
+      if (dx > 0 && state.dir.x === 0) state.dir = {x:1,y:0};
+      else if (dx < 0 && state.dir.x === 0) state.dir = {x:-1,y:0};
+    } else {
+      if (dy > 0 && state.dir.y === 0) state.dir = {x:0,y:1};
+      else if (dy < 0 && state.dir.y === 0) state.dir = {x:0,y:-1};
+    }
+  }, {passive:true});
+  snakeTick = setInterval(step, 140);
+  placeFood();
+  draw();
+}
 
-  const t = Number(new URLSearchParams(location.search).get('t'));
-  if (t && t !== user.teamNumber) { location.replace('team.html?t=' + user.teamNumber); return; }
+/* ---------- API ---------- */
+function api(action, payload){
+  payload = payload || {};
+  var body = JSON.stringify(Object.assign({action: action}, payload));
+  return fetch(API_URL, {
+    method: 'POST',
+    headers: {'Content-Type':'text/plain;charset=utf-8'},
+    body: body, redirect: 'follow', cache: 'no-store'
+  }).then(function(res){
+    return res.text().then(function(text){
+      if (!text) throw new Error('Empty response from server.');
+      try { return JSON.parse(text); }
+      catch (je){
+        if (text.indexOf('<html') >= 0 || text.indexOf('<!DOCTYPE') >= 0)
+          throw new Error('Deployment access must be set to "Anyone".');
+        throw new Error('Unexpected server response.');
+      }
+    });
+  });
+}
+function esc(s){
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function pad(n){ return String(n).padStart(2, '0'); }
+function todayStr(){
+  var d = new Date();
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+}
+function yesterdayStr(){
+  var d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+}
+function debounce(fn, ms){
+  var t;
+  return function(){
+    var a = arguments, c = this;
+    clearTimeout(t);
+    t = setTimeout(function(){ fn.apply(c, a); }, ms);
+  };
+}
+function withSnake(fn){
+  var shown = false;
+  var t = setTimeout(function(){ shown = true; showSnake(); }, 400);
+  return Promise.resolve().then(fn).finally(function(){
+    clearTimeout(t);
+    if (shown) setTimeout(hideSnake, 200);
+  });
+}
+function logout(){
+  localStorage.removeItem('aci_user');
+  sessionStorage.removeItem('aci_team_user');
+  location.href = 'index.html';
+}
+
+/* ---------- BOOT ---------- */
+window.addEventListener('load', function(){
+  var saved = sessionStorage.getItem('aci_team_user') || localStorage.getItem('aci_user');
+  if (!saved){ location.href = 'index.html'; return; }
+  try { user = JSON.parse(saved); }
+  catch (e){ location.href = 'index.html'; return; }
+
+  var t = Number(new URLSearchParams(location.search).get('t'));
+  if (t && t !== user.teamNumber){ location.replace('team.html?t=' + user.teamNumber); return; }
 
   $('headerName').textContent = user.name + ' (' + user.code + ')';
   $('teamTitle').textContent  = user.teamName;
   $('teamSub').textContent    = 'Team ' + user.teamNumber + ' · ' + user.code;
-  const dp = $('teamDP');
+
+  var dp = $('teamDP');
   dp.src = './' + user.teamNumber + '.png';
   dp.onerror = function(){ this.style.visibility = 'hidden'; };
 
-  const di = $('eDate');
-  di.min = yesterdayStr(); di.max = todayStr(); di.value = todayStr();
+  var di = $('eDate');
+  di.min = yesterdayStr();
+  di.max = todayStr();
+  di.value = todayStr();
   di.addEventListener('change', debounce(loadMyEntry, 200));
 
   loadMyEntry();
   loadTeamPosts();
-}, { once:true });
+}, {once:true});
 
-async function loadMyEntry() {
-  const date = $('eDate').value;
+/* ---------- MY ENTRY ---------- */
+function loadMyEntry(){
+  var date = $('eDate').value;
   if (!date) return;
   $('formMsg').textContent = '';
-  try {
-    const r = await api('getMyEntry', { code: user.code, date });
-    const e = r.entry;
-    if (e) {
-      $('formTitle').textContent = '✏️ Edit Your Entry for ' + date;
-      $('submitBtn').textContent = '💾 Update Entry';
-      $('eAttendance').value = e.attendance || 'Present';
-      $('eMinutes').value = e.minutes;
-      $('ePromos').value  = e.promos;
-      $('eApps').value    = e.apps;
-      $('eRegs').value    = e.regs;
-      $('eRemarks').value = e.remarks || '';
-    } else {
-      $('formTitle').textContent = '📝 Submit Your Work';
-      $('submitBtn').textContent = '🚀 Submit';
-      $('eAttendance').value = 'Present';
-      $('eMinutes').value = 0; $('ePromos').value = 0;
-      $('eApps').value = 0;    $('eRegs').value = 0;
-      $('eRemarks').value = '';
-    }
-  } catch (e) {}
+  withSnake(function(){ return api('getMyEntry', {code: user.code, date: date}); })
+    .then(function(r){
+      var e = r.entry;
+      if (e){
+        $('formTitle').textContent = '✏️ Edit Your Entry for ' + date;
+        $('submitBtn').textContent = '💾 Update Entry';
+        $('eAttendance').value = e.attendance || 'Present';
+        $('eMinutes').value = e.minutes;
+        $('ePromos').value  = e.promos;
+        $('eApps').value    = e.apps;
+        $('eRegs').value    = e.regs;
+        $('eRemarks').value = e.remarks || '';
+      } else {
+        $('formTitle').textContent = '📝 Submit Your Work';
+        $('submitBtn').textContent = '🚀 Submit';
+        $('eAttendance').value = 'Present';
+        $('eMinutes').value = 0; $('ePromos').value = 0;
+        $('eApps').value = 0;    $('eRegs').value = 0;
+        $('eRemarks').value = '';
+      }
+    })
+    .catch(function(){});
 }
 
-async function submitEntry(btn) {
-  const date = $('eDate').value;
-  if (!date) { $('formMsg').textContent = 'Please pick a date.'; return; }
-  const o = btn.textContent; btn.disabled = true; btn.textContent = 'Saving…';
+function submitEntry(btn){
+  var date = $('eDate').value;
+  if (!date){ $('formMsg').textContent = 'Please pick a date.'; return; }
+  var o = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Saving…';
   $('formMsg').textContent = '';
-  try {
-    const r = await api('submitEntry', {
-      code: user.code, date,
+  withSnake(function(){
+    return api('submitEntry', {
+      code: user.code, date: date,
       attendance: $('eAttendance').value,
       minutes: Number($('eMinutes').value) || 0,
       promos:  Number($('ePromos').value)  || 0,
@@ -217,46 +415,66 @@ async function submitEntry(btn) {
       regs:    Number($('eRegs').value)    || 0,
       remarks: $('eRemarks').value
     });
-    if (!r.success) { $('formMsg').textContent = r.message; $('formMsg').style.color = '#c00'; return; }
-    $('formMsg').textContent = r.updated ? '✅ Entry updated!' : '✅ Entry saved!';
-    $('formMsg').style.color = '#2e7d32';
-    localStorage.removeItem('aci_lb');
-    await Promise.all([loadMyEntry(), loadTeamPosts()]);
-  } catch (e) {
-    $('formMsg').textContent = 'Failed. Try again.'; $('formMsg').style.color = '#c00';
-  } finally { btn.disabled = false; btn.textContent = o; }
+  })
+    .then(function(r){
+      if (!r.success){
+        $('formMsg').textContent = r.message || 'Failed.';
+        $('formMsg').className = 'err';
+        return;
+      }
+      $('formMsg').textContent = r.updated ? '✅ Entry updated!' : '✅ Entry saved!';
+      $('formMsg').className = 'ok';
+      localStorage.removeItem('aci_lb');
+      return Promise.all([loadMyEntry(), loadTeamPosts()]);
+    })
+    .catch(function(e){
+      $('formMsg').textContent = e.message || 'Failed. Try again.';
+      $('formMsg').className = 'err';
+    })
+    .finally(function(){
+      btn.disabled = false; btn.textContent = o;
+    });
 }
 
-async function loadTeamPosts() {
+/* ---------- TEAM POSTS ---------- */
+function loadTeamPosts(){
   if (!$('feedBox').innerHTML) $('feedBox').innerHTML = '<p class="empty">Loading…</p>';
-  try {
-    const r = await api('getTeamPosts', { teamNumber: user.teamNumber });
-    const posts = r.posts || [];
-    if (!posts.length) { $('feedBox').innerHTML = '<p class="empty">No entries from your team for today or yesterday yet.</p>'; return; }
-    const p = [];
-    for (const x of posts) {
-      const mine = x.code === user.code ? ' mine' : '';
-      const attCls = x.attendance === 'Absent' ? 'absent' : 'present';
-      const dt = new Date(x.updatedAt).toLocaleString();
-      p.push(
-        '<div class="post'+mine+'">'+
-          '<div class="post-head">'+
-            '<div><span class="post-name">'+esc(x.name)+'</span> <span style="color:#666;font-size:.85em;">('+esc(x.code)+')</span></div>'+
-            '<div class="post-date">'+esc(x.date)+' · updated '+dt+'</div>'+
-          '</div>'+
-          '<div>'+
-            '<span class="pill '+attCls+'">'+esc(x.attendance)+'</span>'+
-            '<span class="pill">⏱ '+x.minutes+'m</span>'+
-            '<span class="pill">📢 '+x.promos+'</span>'+
-            '<span class="pill">📝 '+x.apps+'</span>'+
-            '<span class="pill">✅ '+x.regs+'</span>'+
-          '</div>'+
-          (x.remarks ? '<div style="margin-top:6px;font-style:italic;color:#333;">“'+esc(x.remarks)+'”</div>' : '')+
-        '</div>'
-      );
-    }
-    $('feedBox').innerHTML = p.join('');
-  } catch (e) { $('feedBox').innerHTML = '<p class="err">Failed to load feed.</p>'; }
+  withSnake(function(){ return api('getTeamPosts', {teamNumber: user.teamNumber}); })
+    .then(function(r){
+      var posts = r.posts || [];
+      if (!posts.length){
+        $('feedBox').innerHTML = '<p class="empty">No entries from your team for today or yesterday yet.</p>';
+        return;
+      }
+      var p = [];
+      for (var i = 0; i < posts.length; i++){
+        var x = posts[i];
+        var mine = x.code === user.code ? ' mine' : '';
+        var attCls = x.attendance === 'Absent' ? 'absent' : 'present';
+        var dt = new Date(x.updatedAt).toLocaleString();
+        p.push(
+          '<div class="post' + mine + '">' +
+            '<div class="post-head">' +
+              '<div><span class="post-name">' + esc(x.name) + '</span> ' +
+              '<span style="color:#666;font-size:.85em;">(' + esc(x.code) + ')</span></div>' +
+              '<div class="post-date">' + esc(x.date) + ' · updated ' + dt + '</div>' +
+            '</div>' +
+            '<div>' +
+              '<span class="pill ' + attCls + '">' + esc(x.attendance) + '</span>' +
+              '<span class="pill">⏱ ' + x.minutes + 'm</span>' +
+              '<span class="pill">📢 ' + x.promos + '</span>' +
+              '<span class="pill">📝 ' + x.apps + '</span>' +
+              '<span class="pill">✅ ' + x.regs + '</span>' +
+            '</div>' +
+            (x.remarks ? '<div style="margin-top:6px;font-style:italic;color:#333;">“' + esc(x.remarks) + '”</div>' : '') +
+          '</div>'
+        );
+      }
+      $('feedBox').innerHTML = p.join('');
+    })
+    .catch(function(){
+      $('feedBox').innerHTML = '<p class="err">Failed to load feed.</p>';
+    });
 }
 </script>
 </body>
