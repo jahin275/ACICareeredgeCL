@@ -3,22 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Team Dashboard — Clan Orange</title>
+<title>Team Dashboard — ACI Careeredge Campus Lead</title>
+<link rel="icon" href="./favicon.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="preload" as="image" href="./LOGO.png">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
-  :root{--bg:#1bddff;--ground:#2e7d32;--card:rgba(255,255,255,.95);--orange:#ff8c00;}
+  :root{--bg:#0a3d62;--ground:#1e3799;--card:rgba(255,255,255,.96);--accent:#f39c12;--text:#0d1b2a;}
   *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent;}
-  html,body{background:var(--bg);min-height:100vh;overflow-x:hidden;color:#1a1a1a;}
-  #sky{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,#1bddff,#45e3ff 60%,#a8f0ff);}
+  html,body{background:var(--bg);min-height:100vh;overflow-x:hidden;color:var(--text);user-select:none;-webkit-user-select:none;}
+  input,textarea,select{user-select:text;-webkit-user-select:text;}
+  img{-webkit-user-drag:none;pointer-events:none;}
+  #sky{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,#0a3d62,#1e3799 55%,#3c6382);}
   #ground{position:fixed;bottom:0;left:0;width:100%;height:120px;z-index:-1;background:var(--ground);
-    box-shadow:inset 0 6px 0 #1b5e20,inset 0 -10px 0 #1b3d12;
-    background-image:repeating-linear-gradient(90deg,#2e7d32 0 40px,#276b2b 40px 80px);}
+    box-shadow:inset 0 6px 0 #0c2461,inset 0 -10px 0 #061a40;
+    background-image:repeating-linear-gradient(90deg,#1e3799 0 40px,#152a78 40px 80px);}
   header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;
-    background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border-bottom:4px solid #000;
+    background:rgba(0,0,0,.45);backdrop-filter:blur(6px);border-bottom:4px solid #000;
     position:sticky;top:0;z-index:50;}
-  .brand-title{font-family:'Press Start 2P',monospace;font-size:1.05em;color:#fff;
-    text-shadow:2px 2px 0 #000,4px 4px 0 #ff8c00;letter-spacing:1px;}
+  .brand-wrap{display:flex;align-items:center;gap:12px;}
+  .logo{height:46px;image-rendering:pixelated;pointer-events:none;}
+  .brand-title{font-family:'Press Start 2P',monospace;font-size:0.9em;color:#fff;
+    text-shadow:2px 2px 0 #000,3px 3px 0 var(--accent);letter-spacing:1px;line-height:1.3;}
   .user-info{display:flex;align-items:center;gap:12px;color:#fff;font-weight:700;font-size:.9em;}
   .container{max-width:820px;margin:0 auto;padding:18px;}
   .card{background:var(--card);border:4px solid #000;border-radius:12px;padding:18px;margin-bottom:16px;
@@ -30,8 +37,8 @@
     background:#fff;color:#000;box-shadow:3px 3px 0 #000;transition:transform .06s;}
   .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000;}
   .btn:disabled{opacity:.6;cursor:wait;}
-  .btn-primary{background:var(--ground);color:#fff;}
-  .btn-warn{background:var(--orange);color:#fff;}
+  .btn-primary{background:#1e3799;color:#fff;}
+  .btn-warn{background:var(--accent);color:#fff;}
   .pill{display:inline-block;padding:3px 9px;border-radius:12px;background:#e0f7fa;border:2px solid #000;
     font-size:.78em;font-weight:700;margin:2px 4px 2px 0;}
   .pill.absent{background:#ffcdd2;}
@@ -45,13 +52,13 @@
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .empty{color:#666;font-style:italic;font-size:.9em;}
   .err{color:#c00;font-weight:700;}
-  .banner{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;text-shadow:1px 1px 0 #000;
+  .banner{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;text-shadow:1px 1px 0 #000;
     padding:14px 18px;border:4px solid #000;border-radius:12px;box-shadow:6px 6px 0 rgba(0,0,0,.35);margin-bottom:16px;
     display:flex;align-items:center;gap:14px;}
   .team-dp{width:64px;height:64px;border:3px solid #000;border-radius:10px;image-rendering:pixelated;background:#fff;}
   .banner h2{font-size:1.1em;}
   .banner .sub{font-size:.85em;opacity:.95;}
-  @media(max-width:600px){.brand-title{font-size:.8em;} .container{padding:12px;} .grid2{grid-template-columns:1fr;}}
+  @media(max-width:600px){.brand-title{font-size:.62em;} .container{padding:12px;} .grid2{grid-template-columns:1fr;} .logo{height:38px;}}
 </style>
 </head>
 <body>
@@ -59,7 +66,10 @@
 <div id="ground"></div>
 
 <header>
-  <span class="brand-title">🍊 Clan Orange</span>
+  <div class="brand-wrap">
+    <img src="./LOGO.png" alt="ACI Careeredge Campus Lead" class="logo" onerror="this.style.display='none'">
+    <span class="brand-title">ACI Careeredge<br>Campus Lead</span>
+  </div>
   <div class="user-info">
     <a href="index.html" style="color:#fff;text-decoration:none;font-weight:800;">← Leaderboard</a>
     <span id="headerName"></span>
@@ -83,13 +93,13 @@
           <option value="Present">Present</option>
           <option value="Absent">Absent</option>
         </select></div>
-      <div><label>Working Minutes</label><input type="number" id="eMinutes" value="0" min="0"></div>
-      <div><label>Promotional Posts</label><input type="number" id="ePromos" value="0" min="0"></div>
-      <div><label>Successful Applications</label><input type="number" id="eApps" value="0" min="0"></div>
-      <div><label>Successful Registrations</label><input type="number" id="eRegs" value="0" min="0"></div>
+      <div><label>Working Minutes</label><input type="number" id="eMinutes" value="0" min="0" max="10000"></div>
+      <div><label>Promotional Posts</label><input type="number" id="ePromos" value="0" min="0" max="10000"></div>
+      <div><label>Successful Applications</label><input type="number" id="eApps" value="0" min="0" max="10000"></div>
+      <div><label>Successful Registrations</label><input type="number" id="eRegs" value="0" min="0" max="10000"></div>
     </div>
     <label>Remarks (optional)</label>
-    <textarea id="eRemarks" rows="2" placeholder="Anything worth noting?"></textarea>
+    <textarea id="eRemarks" rows="2" maxlength="500" placeholder="Anything worth noting?"></textarea>
     <button class="btn btn-primary" style="width:100%;" id="submitBtn" onclick="submitEntry(this)">🚀 Submit</button>
     <p id="formMsg" style="margin-top:8px;font-weight:700;"></p>
   </div>
@@ -102,6 +112,25 @@
 </div>
 
 <script>
+/* ========== LOCKDOWN ========== */
+(function lockDown(){
+  document.addEventListener('contextmenu', e => e.preventDefault(), { capture:true });
+  document.addEventListener('keydown', e => {
+    const k = (e.key || '').toUpperCase();
+    if (k === 'F12') { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && ['I','J','C','K','M'].includes(k)) { e.preventDefault(); return false; }
+    if (e.ctrlKey && ['U','S','P','A'].includes(k) && !(k === 'A' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA'))) {
+      e.preventDefault(); return false;
+    }
+    if (e.metaKey && e.altKey && ['I','J','C','U'].includes(k)) { e.preventDefault(); return false; }
+  }, { capture:true });
+  document.addEventListener('dragstart', e => e.preventDefault(), { capture:true });
+  document.addEventListener('selectstart', e => {
+    const t = e.target.tagName;
+    if (t !== 'INPUT' && t !== 'TEXTAREA') e.preventDefault();
+  }, { capture:true });
+})();
+
 const API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
 const $ = id => document.getElementById(id);
 let user = null;
@@ -120,45 +149,32 @@ async function api(action, payload) {
   if (!res.ok) throw new Error('HTTP '+res.status);
   return res.json();
 }
-function logout(){ localStorage.removeItem('co_user'); sessionStorage.removeItem('co_team_user'); location.href='index.html'; }
+function logout(){ localStorage.removeItem('aci_user'); sessionStorage.removeItem('aci_team_user'); location.href='index.html'; }
+function debounce(fn, ms) { let t; return function(){ const a=arguments,c=this; clearTimeout(t); t=setTimeout(()=>fn.apply(c,a), ms); }; }
 
-/* Debounce helper for the date-change lookup */
-function debounce(fn, ms) { let t; return function(){ const a=arguments, c=this; clearTimeout(t); t=setTimeout(()=>fn.apply(c,a), ms); }; }
-
-/* ---------- BOOT ---------- */
 window.addEventListener('load', () => {
-  // Prefer session cache primed by index.html (instant), fall back to localStorage
-  let saved = sessionStorage.getItem('co_team_user') || localStorage.getItem('co_user');
+  const saved = sessionStorage.getItem('aci_team_user') || localStorage.getItem('aci_user');
   if (!saved) { location.href = 'index.html'; return; }
-  try { user = JSON.parse(saved); } catch(e){ location.href='index.html'; return; }
+  try { user = JSON.parse(saved); } catch (e) { location.href='index.html'; return; }
 
-  const qp = new URLSearchParams(location.search);
-  const t = Number(qp.get('t'));
-  if (t && t !== user.teamNumber) {
-    location.replace('team.html?t=' + user.teamNumber);
-    return;
-  }
+  const t = Number(new URLSearchParams(location.search).get('t'));
+  if (t && t !== user.teamNumber) { location.replace('team.html?t=' + user.teamNumber); return; }
 
   $('headerName').textContent = user.name + ' (' + user.code + ')';
   $('teamTitle').textContent  = user.teamName;
   $('teamSub').textContent    = 'Team ' + user.teamNumber + ' · ' + user.code;
-
   const dp = $('teamDP');
   dp.src = './' + user.teamNumber + '.png';
   dp.onerror = function(){ this.style.visibility = 'hidden'; };
 
-  const dateInput = $('eDate');
-  dateInput.min = yesterdayStr();
-  dateInput.max = todayStr();
-  dateInput.value = todayStr();
-  dateInput.addEventListener('change', debounce(loadMyEntry, 200));
+  const di = $('eDate');
+  di.min = yesterdayStr(); di.max = todayStr(); di.value = todayStr();
+  di.addEventListener('change', debounce(loadMyEntry, 200));
 
-  // Fire both in parallel
   loadMyEntry();
   loadTeamPosts();
 }, { once:true });
 
-/* ---------- MY ENTRY ---------- */
 async function loadMyEntry() {
   const date = $('eDate').value;
   if (!date) return;
@@ -183,14 +199,13 @@ async function loadMyEntry() {
       $('eApps').value = 0;    $('eRegs').value = 0;
       $('eRemarks').value = '';
     }
-  } catch (e) { console.error(e); }
+  } catch (e) {}
 }
 
 async function submitEntry(btn) {
   const date = $('eDate').value;
   if (!date) { $('formMsg').textContent = 'Please pick a date.'; return; }
-  const orig = btn.textContent;
-  btn.disabled = true; btn.textContent = 'Saving…';
+  const o = btn.textContent; btn.disabled = true; btn.textContent = 'Saving…';
   $('formMsg').textContent = '';
   try {
     const r = await api('submitEntry', {
@@ -205,58 +220,43 @@ async function submitEntry(btn) {
     if (!r.success) { $('formMsg').textContent = r.message; $('formMsg').style.color = '#c00'; return; }
     $('formMsg').textContent = r.updated ? '✅ Entry updated!' : '✅ Entry saved!';
     $('formMsg').style.color = '#2e7d32';
-
-    // Invalidate dashboard cache so it re-fetches fresh leaderboards next time
-    localStorage.removeItem('co_lb');
-
-    // Refresh locally without refetching everything
+    localStorage.removeItem('aci_lb');
     await Promise.all([loadMyEntry(), loadTeamPosts()]);
   } catch (e) {
     $('formMsg').textContent = 'Failed. Try again.'; $('formMsg').style.color = '#c00';
-  } finally {
-    btn.disabled = false; btn.textContent = orig;
-  }
+  } finally { btn.disabled = false; btn.textContent = o; }
 }
 
-/* ---------- TEAM POSTS ---------- */
 async function loadTeamPosts() {
-  if (!$('feedBox').innerHTML) {
-    $('feedBox').innerHTML = '<p class="empty">Loading…</p>';
-  }
+  if (!$('feedBox').innerHTML) $('feedBox').innerHTML = '<p class="empty">Loading…</p>';
   try {
     const r = await api('getTeamPosts', { teamNumber: user.teamNumber });
     const posts = r.posts || [];
-    if (!posts.length) {
-      $('feedBox').innerHTML = '<p class="empty">No entries from your team for today or yesterday yet.</p>';
-      return;
-    }
-    // Build in one shot
-    const parts = [];
-    for (const p of posts) {
-      const mine = p.code === user.code ? ' mine' : '';
-      const attCls = p.attendance === 'Absent' ? 'absent' : 'present';
-      const dt = new Date(p.updatedAt).toLocaleString();
-      parts.push(
+    if (!posts.length) { $('feedBox').innerHTML = '<p class="empty">No entries from your team for today or yesterday yet.</p>'; return; }
+    const p = [];
+    for (const x of posts) {
+      const mine = x.code === user.code ? ' mine' : '';
+      const attCls = x.attendance === 'Absent' ? 'absent' : 'present';
+      const dt = new Date(x.updatedAt).toLocaleString();
+      p.push(
         '<div class="post'+mine+'">'+
           '<div class="post-head">'+
-            '<div><span class="post-name">'+esc(p.name)+'</span> <span style="color:#666;font-size:.85em;">('+esc(p.code)+')</span></div>'+
-            '<div class="post-date">'+esc(p.date)+' · updated '+dt+'</div>'+
+            '<div><span class="post-name">'+esc(x.name)+'</span> <span style="color:#666;font-size:.85em;">('+esc(x.code)+')</span></div>'+
+            '<div class="post-date">'+esc(x.date)+' · updated '+dt+'</div>'+
           '</div>'+
           '<div>'+
-            '<span class="pill '+attCls+'">'+esc(p.attendance)+'</span>'+
-            '<span class="pill">⏱ '+p.minutes+'m</span>'+
-            '<span class="pill">📢 '+p.promos+'</span>'+
-            '<span class="pill">📝 '+p.apps+'</span>'+
-            '<span class="pill">✅ '+p.regs+'</span>'+
+            '<span class="pill '+attCls+'">'+esc(x.attendance)+'</span>'+
+            '<span class="pill">⏱ '+x.minutes+'m</span>'+
+            '<span class="pill">📢 '+x.promos+'</span>'+
+            '<span class="pill">📝 '+x.apps+'</span>'+
+            '<span class="pill">✅ '+x.regs+'</span>'+
           '</div>'+
-          (p.remarks ? '<div style="margin-top:6px;font-style:italic;color:#333;">“'+esc(p.remarks)+'”</div>' : '')+
+          (x.remarks ? '<div style="margin-top:6px;font-style:italic;color:#333;">“'+esc(x.remarks)+'”</div>' : '')+
         '</div>'
       );
     }
-    $('feedBox').innerHTML = parts.join('');
-  } catch (e) {
-    $('feedBox').innerHTML = '<p class="err">Failed to load feed.</p>';
-  }
+    $('feedBox').innerHTML = p.join('');
+  } catch (e) { $('feedBox').innerHTML = '<p class="err">Failed to load feed.</p>'; }
 }
 </script>
 </body>
