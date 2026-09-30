@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Clan Orange — Login</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#1bddff;--ground:#2e7d32;--card:rgba(255,255,255,.95);--orange:#ff8c00;}
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent;}
+  html,body{background:var(--bg);min-height:100vh;overflow-x:hidden;color:#1a1a1a;}
+  #sky{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,#1bddff,#45e3ff 60%,#a8f0ff);}
+  #ground{position:fixed;bottom:0;left:0;width:100%;height:120px;z-index:-1;background:var(--ground);
+    box-shadow:inset 0 6px 0 #1b5e20,inset 0 -10px 0 #1b3d12;
+    background-image:repeating-linear-gradient(90deg,#2e7d32 0 40px,#276b2b 40px 80px);}
+  header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;
+    background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border-bottom:4px solid #000;
+    position:sticky;top:0;z-index:50;will-change:transform;}
+  .brand-title{font-family:'Press Start 2P',monospace;font-size:1.05em;color:#fff;
+    text-shadow:2px 2px 0 #000,4px 4px 0 #ff8c00;letter-spacing:1px;}
+  .user-info{display:flex;align-items:center;gap:12px;color:#fff;font-weight:700;font-size:.9em;}
+  .container{max-width:820px;margin:0 auto;padding:18px;}
+  .card{background:var(--card);border:4px solid #000;border-radius:12px;padding:18px;margin-bottom:16px;
+    box-shadow:6px 6px 0 rgba(0,0,0,.35);}
+  .card h2,.card h3{margin-bottom:10px;}
+  input,textarea{width:100%;padding:10px 12px;margin-bottom:10px;border:3px solid #000;border-radius:8px;font-size:1em;background:#fff;}
+  label{font-weight:600;display:block;margin-bottom:4px;font-size:.9em;}
+  .btn{padding:10px 18px;border:3px solid #000;border-radius:8px;cursor:pointer;font-weight:800;font-size:.95em;
+    background:#fff;color:#000;box-shadow:3px 3px 0 #000;transition:transform .06s;}
+  .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000;}
+  .btn:disabled{opacity:.6;cursor:wait;}
+  .btn-primary{background:var(--ground);color:#fff;}
+  .btn-warn{background:var(--orange);color:#fff;}
+  .btn-secondary{background:#b0bec5;}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  table{width:100%;border-collapse:collapse;font-size:.88em;background:#fff;border:3px solid #000;border-radius:8px;overflow:hidden;}
+  th,td{padding:8px 10px;text-align:left;border-bottom:2px solid #eee;}
+  th{background:#0d2b3e;color:#fff;font-weight:800;font-size:.85em;}
+  tr.me{background:linear-gradient(90deg,#fff3cd,#ffe0b2);font-weight:800;}
+  tr:last-child td{border-bottom:none;}
+  .rank-badge{display:inline-block;min-width:28px;padding:2px 6px;border-radius:6px;background:#ff8c00;color:#fff;
+    font-weight:900;text-align:center;font-size:.85em;}
+  .rank-badge.gold{background:#f9a825;} .rank-badge.silver{background:#9e9e9e;} .rank-badge.bronze{background:#a1887f;}
+  .post{border-bottom:2px dashed #ccc;padding:10px 0;content-visibility:auto;contain-intrinsic-size:80px;}
+  .post:last-child{border-bottom:none;}
+  .post-meta{font-size:.78em;color:#555;}
+  .empty{color:#666;font-style:italic;font-size:.9em;}
+  .err{color:#c00;font-weight:700;margin-top:10px;}
+  .team-dp{width:56px;height:56px;border:3px solid #000;border-radius:8px;image-rendering:pixelated;background:#fff;}
+  .banner{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;text-shadow:1px 1px 0 #000;
+    padding:14px 18px;border:4px solid #000;border-radius:12px;box-shadow:6px 6px 0 rgba(0,0,0,.35);margin-bottom:16px;
+    display:flex;align-items:center;gap:14px;}
+  .banner h2{font-size:1.1em;}
+  .skeleton{animation:sk 1.2s ease-in-out infinite;}
+  .sk-line{background:#ccc;border-radius:6px;height:14px;margin:8px 0;}
+  @keyframes sk{0%,100%{opacity:1}50%{opacity:.5}}
+  @media(max-width:600px){.brand-title{font-size:.8em;} .container{padding:12px;}}
+</style>
+</head>
+<body>
+<div id="sky"></div>
+<div id="ground"></div>
+
+<header>
+  <span class="brand-title">🍊 Clan Orange</span>
+  <div class="user-info" id="userInfo" style="display:none;">
+    <span id="headerName"></span>
+    <button class="btn btn-warn" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="container">
+  <div id="loginView" class="card" style="max-width:440px;margin:60px auto;">
+    <h2>🍊 Login</h2>
+    <p style="margin-bottom:14px;font-size:.9em;color:#555;">Enter your email and CL Code to continue.</p>
+    <label>Email</label>
+    <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+    <label>CL Code</label>
+    <input type="text" id="loginCode" placeholder="CL0103" autocomplete="username"
+           style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-weight:700;">
+    <button class="btn btn-primary" style="width:100%;" id="loginBtn" onclick="handleLogin(this)">Enter</button>
+    <p id="loginError" class="err"></p>
+  </div>
+
+  <div id="mainView" style="display:none;">
+    <div class="banner">
+      <img id="myTeamDP" class="team-dp" alt="">
+      <div>
+        <h2 id="welcomeTitle">Welcome!</h2>
+        <div style="font-size:.85em;opacity:.9;" id="welcomeSub"></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn btn-primary" id="goTeamBtn" href="#">🎯 My Team Dashboard</a>
+      <button class="btn btn-secondary" onclick="refreshAll(this)">🔄 Refresh</button>
+    </div>
+
+    <div class="card">
+      <h3>🏆 Individual Leaderboard</h3>
+      <div id="indLbBox"></div>
+    </div>
+    <div class="card">
+      <h3>🛡️ Team Leaderboard</h3>
+      <div id="teamLbBox"></div>
+    </div>
+    <div class="card">
+      <h3>🌍 Global Feed</h3>
+      <textarea id="globalMsg" rows="3" placeholder="Share a thought with the clan…"></textarea>
+      <button class="btn btn-warn" style="width:100%;" onclick="postGlobal(this)">📣 Post to Global</button>
+      <div id="globalBox" style="margin-top:14px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
+const $ = id => document.getElementById(id);
+const LS_USER = 'co_user', LS_LB = 'co_lb', LS_GLOBAL = 'co_global';
+let user = null;
+
+async function api(action, payload) {
+  payload = payload || {};
+  const res = await fetch(API_URL, {
+    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(Object.assign({action}, payload)),
+    redirect:'follow', cache:'no-store'
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+const ranksBadge = r => r<=3 ? 'gold silver bronze'.split(' ')[r-1] : '';
+
+/* ---------- LOGIN ---------- */
+async function handleLogin(btn) {
+  const email = $('loginEmail').value.trim();
+  const code  = $('loginCode').value.trim();
+  $('loginError').textContent = '';
+  if (!email || !code) { $('loginError').textContent = 'Email and Code required.'; return; }
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Entering…';
+  try {
+    const r = await api('login', { email, code });
+    if (!r.success) { $('loginError').textContent = r.message; return; }
+    user = r.user;
+    localStorage.setItem(LS_USER, JSON.stringify(user));
+    // Prime team page cache so it opens instantly
+    sessionStorage.setItem('co_team_user', JSON.stringify(user));
+    enterApp();
+  } catch (e) { $('loginError').textContent = 'Server error. Try again.'; }
+  finally { btn.disabled = false; btn.textContent = orig; }
+}
+function logout(){ localStorage.removeItem(LS_USER); sessionStorage.removeItem('co_team_user'); location.reload(); }
+
+/* ---------- BOOT ---------- */
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem(LS_USER);
+  if (saved) { try { user = JSON.parse(saved); enterApp(); } catch(e){ localStorage.removeItem(LS_USER); } }
+  fetch(API_URL + '?action=ping').catch(()=>{});
+}, { once:true });
+
+function enterApp() {
+  $('loginView').style.display = 'none';
+  $('mainView').style.display = 'block';
+  $('userInfo').style.display = 'flex';
+  $('headerName').textContent = user.name + ' (' + user.code + ')';
+  $('welcomeTitle').textContent = 'Hi ' + user.name + '!';
+  $('welcomeSub').textContent = user.teamName + ' — ' + user.code;
+  const dp = $('myTeamDP');
+  dp.src = './' + user.teamNumber + '.png';
+  dp.onerror = function(){ this.style.visibility = 'hidden'; };
+  $('goTeamBtn').href = 'team.html?t=' + user.teamNumber;
+
+  // Instant paint from localStorage if available
+  paintCached();
+
+  // Then fetch fresh — single bootstrap call
+  loadBootstrap();
+}
+
+function paintCached() {
+  try {
+    const lb = JSON.parse(localStorage.getItem(LS_LB) || 'null');
+    if (lb) { renderIndividual(lb.individual); renderTeam(lb.team); }
+    const g = JSON.parse(localStorage.getItem(LS_GLOBAL) || 'null');
+    if (g) { renderGlobal(g); }
+  } catch(e){}
+}
+
+async function loadBootstrap() {
+  if (!localStorage.getItem(LS_LB)) {
+    $('indLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div></div>';
+    $('teamLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
+    $('globalBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
+  }
+  try {
+    const r = await api('bootstrap', { code: user.code });
+    if (!r.success) return;
+    if (r.leaderboards) {
+      renderIndividual(r.leaderboards.individual);
+      renderTeam(r.leaderboards.team);
+      localStorage.setItem(LS_LB, JSON.stringify(r.leaderboards));
+    }
+    if (r.global) {
+      renderGlobal(r.global.posts);
+      localStorage.setItem(LS_GLOBAL, JSON.stringify(r.global.posts));
+    }
+  } catch (e) { console.error(e); }
+}
+
+async function refreshAll(btn) {
+  const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Loading…';
+  localStorage.removeItem(LS_LB); localStorage.removeItem(LS_GLOBAL);
+  await loadBootstrap();
+  btn.disabled = false; btn.textContent = orig;
+}
+
+/* ---------- RENDER ---------- */
+function renderIndividual(list) {
+  if (!list || !list.length) { $('indLbBox').innerHTML = '<p class="empty">No scores yet.</p>'; return; }
+  const parts = ['<table><thead><tr><th>#</th><th>Name</th><th>Team</th><th>Points</th></tr></thead><tbody>'];
+  for (const u of list) {
+    const me = user && u.code === user.code ? ' class="me"' : '';
+    parts.push('<tr'+me+'><td><span class="rank-badge '+ranksBadge(u.rank)+'">'+u.rank+'</span></td>'+
+      '<td>'+esc(u.name)+'<div style="font-size:.72em;color:#666;">'+esc(u.code)+'</div></td>'+
+      '<td>'+esc(u.teamName)+'</td><td><strong>'+u.points+'</strong></td></tr>');
+  }
+  parts.push('</tbody></table>');
+  $('indLbBox').innerHTML = parts.join('');
+}
+function renderTeam(list) {
+  if (!list || !list.length) { $('teamLbBox').innerHTML = '<p class="empty">No scores yet.</p>'; return; }
+  const parts = ['<table><thead><tr><th>#</th><th>Team</th><th>Points</th></tr></thead><tbody>'];
+  for (const t of list) {
+    const me = user && t.teamNumber === user.teamNumber ? ' class="me"' : '';
+    parts.push('<tr'+me+'><td><span class="rank-badge '+ranksBadge(t.rank)+'">'+t.rank+'</span></td>'+
+      '<td>'+esc(t.teamName)+' <span style="color:#666;font-size:.8em;">(Team '+t.teamNumber+')</span></td>'+
+      '<td><strong>'+t.points+'</strong></td></tr>');
+  }
+  parts.push('</tbody></table>');
+  $('teamLbBox').innerHTML = parts.join('');
+}
+function renderGlobal(list) {
+  if (!list || !list.length) { $('globalBox').innerHTML = '<p class="empty">No posts yet. Be the first!</p>'; return; }
+  const parts = [];
+  for (const p of list) {
+    const dt = new Date(p.timestamp).toLocaleString();
+    parts.push('<div class="post"><div class="post-meta"><strong>'+esc(p.name)+'</strong> · '+esc(p.teamName)+' · '+dt+'</div>'+
+      '<div style="margin-top:4px;">'+esc(p.message)+'</div></div>');
+  }
+  $('globalBox').innerHTML = parts.join('');
+}
+
+/* ---------- GLOBAL ---------- */
+async function postGlobal(btn) {
+  const msg = $('globalMsg').value.trim();
+  if (!msg) { alert('Type a message first.'); return; }
+  const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Posting…';
+  try {
+    const r = await api('submitGlobalPost', { code: user.code, message: msg });
+    if (!r.success) { alert(r.message || 'Failed.'); return; }
+    $('globalMsg').value = '';
+    const g = await api('getGlobalPosts');
+    renderGlobal(g.posts);
+    localStorage.setItem(LS_GLOBAL, JSON.stringify(g.posts));
+  } catch (e) { alert('Failed.'); }
+  finally { btn.disabled = false; btn.textContent = orig; }
+}
+</script>
+</body>
+</html>
