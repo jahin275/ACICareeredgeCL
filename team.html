@@ -388,6 +388,11 @@ window.addEventListener('load', function(){
   try { user = JSON.parse(saved); }
   catch (e){ location.href = 'index.html'; return; }
 
+  if (!user.teamNumber || user.teamNumber === 0){
+    location.href = 'index.html';
+    return;
+  }
+
   var t = Number(new URLSearchParams(location.search).get('t'));
   if (t && t !== user.teamNumber){ location.replace('team.html?t=' + user.teamNumber); return; }
 
