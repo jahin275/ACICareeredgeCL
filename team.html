@@ -57,10 +57,24 @@
   .btn:disabled{opacity:.6;cursor:wait;}
   .btn-primary{background:var(--ground);color:#fff;}
   .btn-warn{background:var(--orange);color:#fff;}
+
+  .stats-card{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;
+    background:var(--card);border:4px solid #000;border-radius:12px;padding:16px;margin-bottom:16px;
+    box-shadow:6px 6px 0 rgba(0,0,0,.35);}
+  .stat-box{text-align:center;padding:10px 6px;border:3px solid #000;border-radius:8px;
+    background:#e0f7fa;box-shadow:3px 3px 0 #000;}
+  .stat-box.total{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;text-shadow:1px 1px 0 #000;}
+  .stat-box.team{background:linear-gradient(135deg,#5c6bc0,#3949ab);color:#fff;text-shadow:1px 1px 0 #000;}
+  .stat-label{font-family:'Press Start 2P',monospace;font-size:.55em;margin-bottom:8px;display:block;color:#333;}
+  .stat-box.total .stat-label,.stat-box.team .stat-label{color:#fff;}
+  .stat-value{font-family:'Press Start 2P',monospace;font-size:1.1em;font-weight:900;color:#0d2b3e;}
+  .stat-box.total .stat-value,.stat-box.team .stat-value{color:#fff;}
+
   .pill{display:inline-block;padding:3px 9px;border-radius:12px;background:#e0f7fa;border:2px solid #000;
     font-size:.78em;font-weight:700;margin:2px 4px 2px 0;}
   .pill.absent{background:#ffcdd2;}
   .pill.present{background:#c8e6c9;}
+  .pill.readonly{background:#f5f5f5;color:#666;border-style:dashed;}
   .post{border:3px solid #000;border-radius:10px;padding:12px;margin-bottom:10px;background:#fff;
     box-shadow:3px 3px 0 rgba(0,0,0,.25);content-visibility:auto;contain-intrinsic-size:100px;}
   .post.mine{background:linear-gradient(135deg,#fff3cd,#ffe0b2);}
@@ -77,6 +91,7 @@
   .team-dp{width:64px;height:64px;border:3px solid #000;border-radius:10px;image-rendering:pixelated;background:#fff;}
   .banner h2{font-size:1.1em;}
   .banner .sub{font-size:.85em;opacity:.95;}
+  .note{font-size:.8em;color:#555;font-style:italic;margin:-4px 0 8px;}
 
   #snakeOverlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;flex-direction:column;
     justify-content:center;align-items:center;z-index:200;padding:10px;}
@@ -89,6 +104,8 @@
   @media(max-width:600px){
     .brand-title{font-size:.7em;} .logo{height:38px;}
     .container{padding:12px;} .grid2{grid-template-columns:1fr;}
+    .stats-card{grid-template-columns:repeat(2,1fr);padding:12px;gap:8px;}
+    .stat-value{font-size:.95em;} .stat-label{font-size:.5em;}
   }
 </style>
 </head>
@@ -119,6 +136,14 @@
     </div>
   </div>
 
+  <div class="stats-card">
+    <div class="stat-box"><span class="stat-label">TODAY</span><div class="stat-value" id="statDay">0</div></div>
+    <div class="stat-box"><span class="stat-label">WEEK</span><div class="stat-value" id="statWeek">0</div></div>
+    <div class="stat-box"><span class="stat-label">MONTH</span><div class="stat-value" id="statMonth">0</div></div>
+    <div class="stat-box total"><span class="stat-label">YOU</span><div class="stat-value" id="statTotal">0</div></div>
+    <div class="stat-box team"><span class="stat-label">TEAM</span><div class="stat-value" id="statTeam">0</div></div>
+  </div>
+
   <div class="card">
     <h3 id="formTitle">📝 Submit Your Work</h3>
     <label>📅 Date</label>
@@ -131,11 +156,10 @@
         </select></div>
       <div><label>Working Minutes</label><input type="number" id="eMinutes" value="0" min="0" max="10000"></div>
       <div><label>Promotional Posts</label><input type="number" id="ePromos" value="0" min="0" max="10000"></div>
-      <div><label>Successful Applications</label><input type="number" id="eApps" value="0" min="0" max="10000"></div>
-      <div><label>Successful Registrations</label><input type="number" id="eRegs" value="0" min="0" max="10000"></div>
     </div>
     <label>Remarks (optional)</label>
     <textarea id="eRemarks" rows="2" maxlength="500" placeholder="Anything worth noting?"></textarea>
+    <p class="note">Successful Applications &amp; Registrations are recorded by the campus admin.</p>
     <button class="btn btn-primary" style="width:100%;" id="submitBtn" onclick="submitEntry(this)">🚀 Submit</button>
     <p id="formMsg" style="margin-top:8px;font-weight:700;"></p>
   </div>
@@ -180,19 +204,22 @@ var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAo
 var $ = function(id){ return document.getElementById(id); };
 var user = null;
 
-/* ---------- SNAKE LOADER ---------- */
-var snakeTick = null, snakeKeyHandler = null;
+/* ---------- SNAKE ---------- */
+var snakeGameId = 0;
 function showSnake(){
+  snakeGameId++;
+  var id = snakeGameId;
   $('snakeOverlay').classList.add('show');
-  startSnake();
+  startSnake(id);
 }
 function hideSnake(){
+  snakeGameId++;
   $('snakeOverlay').classList.remove('show');
-  if (snakeTick) { clearInterval(snakeTick); snakeTick = null; }
-  if (snakeKeyHandler) { document.removeEventListener('keydown', snakeKeyHandler); snakeKeyHandler = null; }
 }
-function startSnake(){
-  var canvas = $('snakeCanvas');
+function startSnake(myId){
+  var oldCanvas = $('snakeCanvas');
+  var canvas = oldCanvas.cloneNode(true);
+  oldCanvas.parentNode.replaceChild(canvas, oldCanvas);
   var ctx = canvas.getContext('2d');
   var GRID = 18;
   var SIZE = canvas.width / GRID;
@@ -240,12 +267,14 @@ function startSnake(){
     $('snakeScore').textContent = state.score;
   }
   function step(){
+    if (myId !== snakeGameId) return;
     if (state.over) return;
     var head = { x: state.snake[0].x + state.dir.x, y: state.snake[0].y + state.dir.y };
     if (head.x < 0 || head.y < 0 || head.x >= GRID || head.y >= GRID ||
         state.snake.some(function(s){ return s.x === head.x && s.y === head.y; })){
       state.over = true;
       setTimeout(function(){
+        if (myId !== snakeGameId) return;
         state.snake = [{x:9,y:9},{x:8,y:9},{x:7,y:9}];
         state.dir = {x:1,y:0}; state.score = 0; state.over = false;
         placeFood();
@@ -257,7 +286,8 @@ function startSnake(){
     else state.snake.pop();
     draw();
   }
-  snakeKeyHandler = function(e){
+  var keyHandler = function(e){
+    if (myId !== snakeGameId) return;
     var k = e.key;
     if (k === 'ArrowUp'    && state.dir.y === 0) state.dir = {x:0,y:-1};
     if (k === 'ArrowDown'  && state.dir.y === 0) state.dir = {x:0,y:1};
@@ -265,12 +295,14 @@ function startSnake(){
     if (k === 'ArrowRight' && state.dir.x === 0) state.dir = {x:1,y:0};
     if (k.indexOf('Arrow') === 0) e.preventDefault();
   };
-  document.addEventListener('keydown', snakeKeyHandler);
+  document.addEventListener('keydown', keyHandler);
+
   var tsX = 0, tsY = 0;
   canvas.addEventListener('touchstart', function(e){
     tsX = e.touches[0].clientX; tsY = e.touches[0].clientY;
   }, {passive:true});
   canvas.addEventListener('touchend', function(e){
+    if (myId !== snakeGameId) return;
     var dx = e.changedTouches[0].clientX - tsX;
     var dy = e.changedTouches[0].clientY - tsY;
     if (Math.abs(dx) > Math.abs(dy)){
@@ -281,7 +313,16 @@ function startSnake(){
       else if (dy < 0 && state.dir.y === 0) state.dir = {x:0,y:-1};
     }
   }, {passive:true});
-  snakeTick = setInterval(step, 140);
+
+  var tick = setInterval(function(){
+    if (myId !== snakeGameId){
+      clearInterval(tick);
+      document.removeEventListener('keydown', keyHandler);
+      return;
+    }
+    step();
+  }, 140);
+
   placeFood();
   draw();
 }
@@ -311,15 +352,8 @@ function esc(s){
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function pad(n){ return String(n).padStart(2, '0'); }
-function todayStr(){
-  var d = new Date();
-  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-}
-function yesterdayStr(){
-  var d = new Date();
-  d.setDate(d.getDate() - 1);
-  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-}
+function todayStr(){ var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function yesterdayStr(){ var d = new Date(); d.setDate(d.getDate() - 1); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
 function debounce(fn, ms){
   var t;
   return function(){
@@ -328,12 +362,17 @@ function debounce(fn, ms){
     t = setTimeout(function(){ fn.apply(c, a); }, ms);
   };
 }
+var snakeShown = false;
 function withSnake(fn){
-  var shown = false;
-  var t = setTimeout(function(){ shown = true; showSnake(); }, 400);
+  var timer = setTimeout(function(){
+    if (!snakeShown){ snakeShown = true; showSnake(); }
+  }, 400);
   return Promise.resolve().then(fn).finally(function(){
-    clearTimeout(t);
-    if (shown) setTimeout(hideSnake, 200);
+    clearTimeout(timer);
+    if (snakeShown){
+      snakeShown = false;
+      setTimeout(hideSnake, 200);
+    }
   });
 }
 function logout(){
@@ -366,11 +405,25 @@ window.addEventListener('load', function(){
   di.value = todayStr();
   di.addEventListener('change', debounce(loadMyEntry, 200));
 
+  loadStats();
   loadMyEntry();
   loadTeamPosts();
 }, {once:true});
 
-/* ---------- MY ENTRY ---------- */
+function paintStats(s){
+  $('statDay').textContent   = s.day;
+  $('statWeek').textContent  = s.week;
+  $('statMonth').textContent = s.month;
+  $('statTotal').textContent = s.total;
+  $('statTeam').textContent  = s.teamMonth;
+}
+
+function loadStats(){
+  withSnake(function(){ return api('getStats', {code: user.code}); })
+    .then(function(r){ if (r.success) paintStats(r); })
+    .catch(function(){});
+}
+
 function loadMyEntry(){
   var date = $('eDate').value;
   if (!date) return;
@@ -384,15 +437,13 @@ function loadMyEntry(){
         $('eAttendance').value = e.attendance || 'Present';
         $('eMinutes').value = e.minutes;
         $('ePromos').value  = e.promos;
-        $('eApps').value    = e.apps;
-        $('eRegs').value    = e.regs;
         $('eRemarks').value = e.remarks || '';
       } else {
         $('formTitle').textContent = '📝 Submit Your Work';
         $('submitBtn').textContent = '🚀 Submit';
         $('eAttendance').value = 'Present';
-        $('eMinutes').value = 0; $('ePromos').value = 0;
-        $('eApps').value = 0;    $('eRegs').value = 0;
+        $('eMinutes').value = 0;
+        $('ePromos').value = 0;
         $('eRemarks').value = '';
       }
     })
@@ -411,8 +462,6 @@ function submitEntry(btn){
       attendance: $('eAttendance').value,
       minutes: Number($('eMinutes').value) || 0,
       promos:  Number($('ePromos').value)  || 0,
-      apps:    Number($('eApps').value)    || 0,
-      regs:    Number($('eRegs').value)    || 0,
       remarks: $('eRemarks').value
     });
   })
@@ -424,8 +473,7 @@ function submitEntry(btn){
       }
       $('formMsg').textContent = r.updated ? '✅ Entry updated!' : '✅ Entry saved!';
       $('formMsg').className = 'ok';
-      localStorage.removeItem('aci_lb');
-      return Promise.all([loadMyEntry(), loadTeamPosts()]);
+      return Promise.all([loadStats(), loadMyEntry(), loadTeamPosts()]);
     })
     .catch(function(e){
       $('formMsg').textContent = e.message || 'Failed. Try again.';
@@ -436,7 +484,6 @@ function submitEntry(btn){
     });
 }
 
-/* ---------- TEAM POSTS ---------- */
 function loadTeamPosts(){
   if (!$('feedBox').innerHTML) $('feedBox').innerHTML = '<p class="empty">Loading…</p>';
   withSnake(function(){ return api('getTeamPosts', {teamNumber: user.teamNumber}); })
@@ -463,8 +510,8 @@ function loadTeamPosts(){
               '<span class="pill ' + attCls + '">' + esc(x.attendance) + '</span>' +
               '<span class="pill">⏱ ' + x.minutes + 'm</span>' +
               '<span class="pill">📢 ' + x.promos + '</span>' +
-              '<span class="pill">📝 ' + x.apps + '</span>' +
-              '<span class="pill">✅ ' + x.regs + '</span>' +
+              '<span class="pill readonly">📝 ' + x.apps + '</span>' +
+              '<span class="pill readonly">✅ ' + x.regs + '</span>' +
             '</div>' +
             (x.remarks ? '<div style="margin-top:6px;font-style:italic;color:#333;">“' + esc(x.remarks) + '”</div>' : '') +
           '</div>'
