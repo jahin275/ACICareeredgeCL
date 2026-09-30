@@ -59,6 +59,24 @@
   .btn-warn{background:var(--orange);color:#fff;}
   .btn-secondary{background:#b0bec5;}
   .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+
+  .stats-card{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;
+    background:var(--card);border:4px solid #000;border-radius:12px;padding:16px;margin-bottom:16px;
+    box-shadow:6px 6px 0 rgba(0,0,0,.35);}
+  .stat-box{text-align:center;padding:10px 6px;border:3px solid #000;border-radius:8px;
+    background:#e0f7fa;box-shadow:3px 3px 0 #000;}
+  .stat-box.total{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;text-shadow:1px 1px 0 #000;}
+  .stat-box.team{background:linear-gradient(135deg,#5c6bc0,#3949ab);color:#fff;text-shadow:1px 1px 0 #000;}
+  .stat-label{font-family:'Press Start 2P',monospace;font-size:.55em;margin-bottom:8px;display:block;color:#333;}
+  .stat-box.total .stat-label,.stat-box.team .stat-label{color:#fff;}
+  .stat-value{font-family:'Press Start 2P',monospace;font-size:1.1em;font-weight:900;color:#0d2b3e;}
+  .stat-box.total .stat-value,.stat-box.team .stat-value{color:#fff;}
+
+  .month-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .month-tab{padding:6px 12px;border:3px solid #000;border-radius:20px;cursor:pointer;font-weight:800;
+    font-size:.8em;background:#fff;box-shadow:2px 2px 0 #000;}
+  .month-tab.active{background:var(--orange);color:#fff;}
+
   table{width:100%;border-collapse:collapse;font-size:.88em;background:#fff;border:3px solid #000;border-radius:8px;overflow:hidden;}
   th,td{padding:8px 10px;text-align:left;border-bottom:2px solid #eee;}
   th{background:var(--dark);color:#fff;font-weight:800;font-size:.85em;}
@@ -67,6 +85,7 @@
   .rank-badge{display:inline-block;min-width:28px;padding:2px 6px;border-radius:6px;background:var(--orange);color:#fff;
     font-weight:900;text-align:center;font-size:.85em;}
   .rank-badge.gold{background:#f9a825;} .rank-badge.silver{background:#9e9e9e;} .rank-badge.bronze{background:#a1887f;}
+
   .post{border-bottom:2px dashed #ccc;padding:10px 0;content-visibility:auto;contain-intrinsic-size:80px;}
   .post:last-child{border-bottom:none;}
   .post-meta{font-size:.78em;color:#555;}
@@ -94,6 +113,8 @@
     .brand-title{font-size:.7em;} .logo{height:38px;}
     .container{padding:12px;} .card{padding:14px;}
     .btn-row .btn{flex:1 1 45%;}
+    .stats-card{grid-template-columns:repeat(2,1fr);padding:12px;gap:8px;}
+    .stat-value{font-size:.95em;} .stat-label{font-size:.5em;}
   }
 </style>
 </head>
@@ -121,7 +142,7 @@
     <label>Email</label>
     <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
     <label>CL Code</label>
-    <input type="text" id="loginCode" placeholder="CL0103" autocomplete="username" maxlength="12"
+    <input type="text" id="loginCode" placeholder="CL0000" autocomplete="username" maxlength="12"
            style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-weight:700;">
     <button class="btn btn-primary" style="width:100%;" id="loginBtn" onclick="handleLogin(this)">Enter</button>
     <p id="loginError" class="err"></p>
@@ -136,12 +157,31 @@
         <div style="font-size:.85em;opacity:.9;" id="welcomeSub"></div>
       </div>
     </div>
+
+    <div class="stats-card" id="statsCard">
+      <div class="stat-box"><span class="stat-label">TODAY</span><div class="stat-value" id="statDay">0</div></div>
+      <div class="stat-box"><span class="stat-label">WEEK</span><div class="stat-value" id="statWeek">0</div></div>
+      <div class="stat-box"><span class="stat-label">MONTH</span><div class="stat-value" id="statMonth">0</div></div>
+      <div class="stat-box total"><span class="stat-label">YOU</span><div class="stat-value" id="statTotal">0</div></div>
+      <div class="stat-box team"><span class="stat-label">TEAM</span><div class="stat-value" id="statTeam">0</div></div>
+    </div>
+
     <div class="btn-row">
       <a class="btn btn-primary" id="goTeamBtn" href="#">🎯 My Team Dashboard</a>
       <button class="btn btn-secondary" onclick="refreshAll(this)">🔄 Refresh</button>
     </div>
-    <div class="card"><h3>🏆 Individual Leaderboard</h3><div id="indLbBox"></div></div>
-    <div class="card"><h3>🛡️ Team Leaderboard</h3><div id="teamLbBox"></div></div>
+
+    <div class="card">
+      <h3>🏆 Individual Leaderboard</h3>
+      <div class="month-tabs" id="monthTabs"></div>
+      <div id="indLbBox"></div>
+    </div>
+
+    <div class="card">
+      <h3>🛡️ Team Leaderboard</h3>
+      <div id="teamLbBox"></div>
+    </div>
+
     <div class="card">
       <h3>🌍 Global Feed</h3>
       <textarea id="globalMsg" rows="3" maxlength="800" placeholder="Share a thought with the campus…"></textarea>
@@ -182,22 +222,27 @@ window.addEventListener('scroll', function(){
 
 var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
 var $ = function(id){ return document.getElementById(id); };
-var LS_USER = 'aci_user', LS_LB = 'aci_lb', LS_GLOBAL = 'aci_global';
+var LS_USER = 'aci_user';
 var user = null;
+var currentMonth = '';
+var monthsList = [];
 
-/* ---------- SNAKE LOADER ---------- */
-var snakeTick = null, snakeKeyHandler = null;
+/* ---------- SNAKE (singleton, no glitch) ---------- */
+var snakeGameId = 0;
 function showSnake(){
+  snakeGameId++;
+  var id = snakeGameId;
   $('snakeOverlay').classList.add('show');
-  startSnake();
+  startSnake(id);
 }
 function hideSnake(){
+  snakeGameId++;
   $('snakeOverlay').classList.remove('show');
-  if (snakeTick) { clearInterval(snakeTick); snakeTick = null; }
-  if (snakeKeyHandler) { document.removeEventListener('keydown', snakeKeyHandler); snakeKeyHandler = null; }
 }
-function startSnake(){
-  var canvas = $('snakeCanvas');
+function startSnake(myId){
+  var oldCanvas = $('snakeCanvas');
+  var canvas = oldCanvas.cloneNode(true);
+  oldCanvas.parentNode.replaceChild(canvas, oldCanvas);
   var ctx = canvas.getContext('2d');
   var GRID = 18;
   var SIZE = canvas.width / GRID;
@@ -245,12 +290,14 @@ function startSnake(){
     $('snakeScore').textContent = state.score;
   }
   function step(){
+    if (myId !== snakeGameId) return;
     if (state.over) return;
     var head = { x: state.snake[0].x + state.dir.x, y: state.snake[0].y + state.dir.y };
     if (head.x < 0 || head.y < 0 || head.x >= GRID || head.y >= GRID ||
         state.snake.some(function(s){ return s.x === head.x && s.y === head.y; })){
       state.over = true;
       setTimeout(function(){
+        if (myId !== snakeGameId) return;
         state.snake = [{x:9,y:9},{x:8,y:9},{x:7,y:9}];
         state.dir = {x:1,y:0}; state.score = 0; state.over = false;
         placeFood();
@@ -262,7 +309,8 @@ function startSnake(){
     else state.snake.pop();
     draw();
   }
-  snakeKeyHandler = function(e){
+  var keyHandler = function(e){
+    if (myId !== snakeGameId) return;
     var k = e.key;
     if (k === 'ArrowUp'    && state.dir.y === 0) state.dir = {x:0,y:-1};
     if (k === 'ArrowDown'  && state.dir.y === 0) state.dir = {x:0,y:1};
@@ -270,12 +318,14 @@ function startSnake(){
     if (k === 'ArrowRight' && state.dir.x === 0) state.dir = {x:1,y:0};
     if (k.indexOf('Arrow') === 0) e.preventDefault();
   };
-  document.addEventListener('keydown', snakeKeyHandler);
+  document.addEventListener('keydown', keyHandler);
+
   var tsX = 0, tsY = 0;
   canvas.addEventListener('touchstart', function(e){
     tsX = e.touches[0].clientX; tsY = e.touches[0].clientY;
   }, {passive:true});
   canvas.addEventListener('touchend', function(e){
+    if (myId !== snakeGameId) return;
     var dx = e.changedTouches[0].clientX - tsX;
     var dy = e.changedTouches[0].clientY - tsY;
     if (Math.abs(dx) > Math.abs(dy)){
@@ -286,7 +336,16 @@ function startSnake(){
       else if (dy < 0 && state.dir.y === 0) state.dir = {x:0,y:-1};
     }
   }, {passive:true});
-  snakeTick = setInterval(step, 140);
+
+  var tick = setInterval(function(){
+    if (myId !== snakeGameId){
+      clearInterval(tick);
+      document.removeEventListener('keydown', keyHandler);
+      return;
+    }
+    step();
+  }, 140);
+
   placeFood();
   draw();
 }
@@ -317,12 +376,17 @@ function esc(s){
 }
 function badge(r){ return r <= 3 ? 'gold silver bronze'.split(' ')[r-1] : ''; }
 
+var snakeShown = false;
 function withSnake(fn){
-  var shown = false;
-  var t = setTimeout(function(){ shown = true; showSnake(); }, 400);
+  var timer = setTimeout(function(){
+    if (!snakeShown){ snakeShown = true; showSnake(); }
+  }, 400);
   return Promise.resolve().then(fn).finally(function(){
-    clearTimeout(t);
-    if (shown) setTimeout(hideSnake, 200);
+    clearTimeout(timer);
+    if (snakeShown){
+      snakeShown = false;
+      setTimeout(hideSnake, 200);
+    }
   });
 }
 
@@ -377,49 +441,74 @@ function enterApp(){
   dp.src = './' + user.teamNumber + '.png';
   dp.onerror = function(){ this.style.visibility = 'hidden'; };
   $('goTeamBtn').href = 'team.html?t=' + user.teamNumber;
-  paintCached();
   loadBootstrap();
 }
-function paintCached(){
-  try {
-    var lb = JSON.parse(localStorage.getItem(LS_LB) || 'null');
-    if (lb){ renderIndividual(lb.individual); renderTeam(lb.team); }
-    var g = JSON.parse(localStorage.getItem(LS_GLOBAL) || 'null');
-    if (g) renderGlobal(g);
-  } catch (e) {}
-}
+
 function loadBootstrap(){
-  if (!localStorage.getItem(LS_LB)){
-    $('indLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div></div>';
-    $('teamLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
-    $('globalBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
-  }
+  $('indLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div></div>';
+  $('teamLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
+  $('globalBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
   withSnake(function(){ return api('bootstrap', {code: user.code}); })
     .then(function(r){
       if (!r.success) return;
+      if (r.stats) paintStats(r.stats);
+      if (r.months){ monthsList = r.months; currentMonth = r.currentMonth || monthsList[0]; renderMonthTabs(); }
       if (r.leaderboards){
         renderIndividual(r.leaderboards.individual);
         renderTeam(r.leaderboards.team);
-        localStorage.setItem(LS_LB, JSON.stringify(r.leaderboards));
       }
-      if (r.global){
-        renderGlobal(r.global.posts);
-        localStorage.setItem(LS_GLOBAL, JSON.stringify(r.global.posts));
-      }
+      if (r.global) renderGlobal(r.global.posts);
     })
-    .catch(function(){});
+    .catch(function(e){ console.error(e); });
 }
 function refreshAll(btn){
   var o = btn.textContent;
   btn.disabled = true; btn.textContent = 'Loading…';
-  localStorage.removeItem(LS_LB);
-  localStorage.removeItem(LS_GLOBAL);
   loadBootstrap().then(function(){
     btn.disabled = false; btn.textContent = o;
   });
 }
+function paintStats(s){
+  $('statDay').textContent   = s.day;
+  $('statWeek').textContent  = s.week;
+  $('statMonth').textContent = s.month;
+  $('statTotal').textContent = s.total;
+  $('statTeam').textContent  = s.teamMonth;
+}
+
+/* ---------- MONTHS ---------- */
+function prettyMonth(m){
+  var parts = m.split('-');
+  var names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return names[parseInt(parts[1], 10) - 1] + ' ' + parts[0];
+}
+function renderMonthTabs(){
+  var html = '';
+  for (var i = 0; i < monthsList.length; i++){
+    var m = monthsList[i];
+    html += '<button class="month-tab' + (m === currentMonth ? ' active' : '') + '" ' +
+            'onclick="switchMonth(\'' + m + '\')">' + prettyMonth(m) + '</button>';
+  }
+  $('monthTabs').innerHTML = html;
+}
+function switchMonth(m){
+  currentMonth = m;
+  renderMonthTabs();
+  $('indLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
+  $('teamLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
+  withSnake(function(){ return api('getLeaderboards', {month: m}); })
+    .then(function(r){
+      if (r.success){
+        renderIndividual(r.individual);
+        renderTeam(r.team);
+      }
+    })
+    .catch(function(){});
+}
+
+/* ---------- RENDER ---------- */
 function renderIndividual(list){
-  if (!list || !list.length){ $('indLbBox').innerHTML = '<p class="empty">No scores yet.</p>'; return; }
+  if (!list || !list.length){ $('indLbBox').innerHTML = '<p class="empty">No scores this month.</p>'; return; }
   var p = ['<table><thead><tr><th>#</th><th>Name</th><th>Team</th><th>Points</th></tr></thead><tbody>'];
   for (var i = 0; i < list.length; i++){
     var u = list[i];
@@ -432,7 +521,7 @@ function renderIndividual(list){
   $('indLbBox').innerHTML = p.join('');
 }
 function renderTeam(list){
-  if (!list || !list.length){ $('teamLbBox').innerHTML = '<p class="empty">No scores yet.</p>'; return; }
+  if (!list || !list.length){ $('teamLbBox').innerHTML = '<p class="empty">No scores this month.</p>'; return; }
   var p = ['<table><thead><tr><th>#</th><th>Team</th><th>Points</th></tr></thead><tbody>'];
   for (var i = 0; i < list.length; i++){
     var t = list[i];
@@ -465,10 +554,7 @@ function postGlobal(btn){
     .then(function(r){
       if (!r.success){ alert(r.message || 'Failed.'); return; }
       $('globalMsg').value = '';
-      return api('getGlobalPosts').then(function(g){
-        renderGlobal(g.posts);
-        localStorage.setItem(LS_GLOBAL, JSON.stringify(g.posts));
-      });
+      return api('getGlobalPosts').then(function(g){ renderGlobal(g.posts); });
     })
     .catch(function(e){ alert(e.message || 'Failed.'); })
     .finally(function(){ btn.disabled = false; btn.textContent = o; });
