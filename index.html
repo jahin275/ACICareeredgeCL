@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0a3d62">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>ACI Careeredge Campus Lead</title>
 <link rel="icon" href="./favicon.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +15,7 @@
 <style>
   :root{--bg:#1bddff;--ground:#2e7d32;--card:rgba(255,255,255,.94);--orange:#ff8c00;--text:#1a1a1a;--dark:#0d2b3e;}
   *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent;}
-  html,body{background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;user-select:none;-webkit-user-select:none;}
+  html,body{background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;user-select:none;-webkit-user-select:none;overscroll-behavior-y:contain;}
   input,textarea,select{user-select:text;-webkit-user-select:text;}
   img{-webkit-user-drag:none;pointer-events:none;}
 
@@ -20,101 +23,114 @@
     background:
       radial-gradient(circle at 20% 20%, #fff6 0 4px, transparent 5px),
       radial-gradient(circle at 70% 40%, #fff6 0 6px, transparent 7px),
-      radial-gradient(circle at 40% 70%, #fff4 0 3px, transparent 4px),
       radial-gradient(circle at 85% 15%, #fff5 0 5px, transparent 6px),
       linear-gradient(180deg, #1bddff 0%, #45e3ff 60%, #a8f0ff 100%);
-    background-size:200px 200px,300px 300px,150px 150px,250px 250px,100% 100%;
+    background-size:200px 200px,300px 300px,250px 250px,100% 100%;
     will-change:transform;}
   #clouds{position:fixed;inset:0;z-index:-1;pointer-events:none;
     background-image:
       radial-gradient(ellipse 80px 30px at 15% 15%, #fff, transparent 70%),
-      radial-gradient(ellipse 100px 35px at 60% 25%, #fff, transparent 70%),
-      radial-gradient(ellipse 70px 25px at 35% 45%, #fff, transparent 70%);
-    opacity:.55;will-change:transform;}
-  #ground{position:fixed;bottom:0;left:0;width:100%;height:120px;z-index:-1;background:var(--ground);
-    box-shadow:inset 0 6px 0 #1b5e20,inset 0 -10px 0 #1b3d12;
+      radial-gradient(ellipse 100px 35px at 60% 25%, #fff, transparent 70%);
+    opacity:.5;will-change:transform;}
+  #ground{position:fixed;bottom:0;left:0;width:100%;height:100px;z-index:-1;background:var(--ground);
+    box-shadow:inset 0 6px 0 #1b5e20;
     background-image:repeating-linear-gradient(90deg,#2e7d32 0 40px,#276b2b 40px 80px);}
 
-  header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;
-    background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border-bottom:4px solid #000;
-    position:sticky;top:0;z-index:50;}
-  .brand-wrap{display:flex;align-items:center;gap:12px;}
-  .logo{height:46px;image-rendering:pixelated;}
-  .brand-title{font-family:'Press Start 2P',monospace;font-size:.9em;color:#fff;
-    text-shadow:2px 2px 0 #000,4px 4px 0 #ff8c00;letter-spacing:1px;line-height:1.3;
-    -webkit-font-smoothing:none;}
-  .user-info{display:flex;align-items:center;gap:12px;color:#fff;font-weight:700;font-size:.9em;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;
+    background:rgba(0,0,0,.4);backdrop-filter:blur(6px);border-bottom:4px solid #000;
+    position:sticky;top:0;z-index:50;
+    padding-top:max(10px, env(safe-area-inset-top));}
+  .brand-wrap{display:flex;align-items:center;gap:10px;min-width:0;}
+  .logo{height:40px;image-rendering:pixelated;flex-shrink:0;}
+  .brand-title{font-family:'Press Start 2P',monospace;font-size:.75em;color:#fff;
+    text-shadow:2px 2px 0 #000,3px 3px 0 #ff8c00;letter-spacing:1px;line-height:1.3;
+    -webkit-font-smoothing:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .user-info{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:.8em;min-width:0;}
+  .user-info span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;}
 
-  .container{max-width:820px;margin:0 auto;padding:18px;}
-  .card{background:var(--card);border:4px solid #000;border-radius:12px;padding:18px;margin-bottom:16px;
-    box-shadow:6px 6px 0 rgba(0,0,0,.35);}
-  .card h2,.card h3{margin-bottom:10px;}
-  input,textarea{width:100%;padding:10px 12px;margin-bottom:10px;border:3px solid #000;border-radius:8px;font-size:1em;background:#fff;}
-  label{font-weight:600;display:block;margin-bottom:4px;font-size:.9em;}
-  .btn{padding:10px 18px;border:3px solid #000;border-radius:8px;cursor:pointer;font-weight:800;font-size:.95em;
-    background:#fff;color:#000;box-shadow:3px 3px 0 #000;transition:transform .06s;}
+  .container{max-width:820px;margin:0 auto;padding:14px;
+    padding-bottom:max(20px, env(safe-area-inset-bottom));}
+  .card{background:var(--card);border:4px solid #000;border-radius:12px;padding:16px;margin-bottom:14px;
+    box-shadow:5px 5px 0 rgba(0,0,0,.35);}
+  .card h2,.card h3{margin-bottom:10px;font-size:1.05em;}
+  input,textarea{width:100%;padding:14px 14px;margin-bottom:10px;border:3px solid #000;border-radius:8px;
+    background:#fff;font-size:16px;touch-action:manipulation;}
+  label{font-weight:600;display:block;margin-bottom:4px;font-size:.88em;}
+  .btn{padding:14px 20px;min-height:48px;border:3px solid #000;border-radius:8px;cursor:pointer;
+    font-weight:800;font-size:1em;background:#fff;color:#000;box-shadow:3px 3px 0 #000;
+    transition:transform .06s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
   .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000;}
   .btn:disabled{opacity:.6;cursor:wait;}
   .btn-primary{background:var(--ground);color:#fff;}
   .btn-warn{background:var(--orange);color:#fff;}
   .btn-secondary{background:#b0bec5;}
-  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
 
-  .stats-card{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;
-    background:var(--card);border:4px solid #000;border-radius:12px;padding:16px;margin-bottom:16px;
-    box-shadow:6px 6px 0 rgba(0,0,0,.35);}
-  .stat-box{text-align:center;padding:10px 6px;border:3px solid #000;border-radius:8px;
-    background:#e0f7fa;box-shadow:3px 3px 0 #000;}
+  .stats-card{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
+    background:var(--card);border:4px solid #000;border-radius:12px;padding:12px;margin-bottom:14px;
+    box-shadow:5px 5px 0 rgba(0,0,0,.35);}
+  .stat-box{text-align:center;padding:10px 4px;border:3px solid #000;border-radius:8px;
+    background:#e0f7fa;box-shadow:2px 2px 0 #000;}
   .stat-box.total{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;text-shadow:1px 1px 0 #000;}
   .stat-box.team{background:linear-gradient(135deg,#5c6bc0,#3949ab);color:#fff;text-shadow:1px 1px 0 #000;}
-  .stat-label{font-family:'Press Start 2P',monospace;font-size:.55em;margin-bottom:8px;display:block;color:#333;}
+  .stat-label{font-family:'Press Start 2P',monospace;font-size:.5em;margin-bottom:6px;display:block;color:#333;}
   .stat-box.total .stat-label,.stat-box.team .stat-label{color:#fff;}
-  .stat-value{font-family:'Press Start 2P',monospace;font-size:1.1em;font-weight:900;color:#0d2b3e;}
+  .stat-value{font-family:'Press Start 2P',monospace;font-size:1em;font-weight:900;color:#0d2b3e;}
   .stat-box.total .stat-value,.stat-box.team .stat-value{color:#fff;}
 
   .month-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
-  .month-tab{padding:6px 12px;border:3px solid #000;border-radius:20px;cursor:pointer;font-weight:800;
-    font-size:.8em;background:#fff;box-shadow:2px 2px 0 #000;}
+  .month-tab{padding:8px 14px;min-height:40px;border:3px solid #000;border-radius:20px;cursor:pointer;
+    font-weight:800;font-size:.8em;background:#fff;box-shadow:2px 2px 0 #000;touch-action:manipulation;}
   .month-tab.active{background:var(--orange);color:#fff;}
 
-  table{width:100%;border-collapse:collapse;font-size:.88em;background:#fff;border:3px solid #000;border-radius:8px;overflow:hidden;}
-  th,td{padding:8px 10px;text-align:left;border-bottom:2px solid #eee;}
-  th{background:var(--dark);color:#fff;font-weight:800;font-size:.85em;}
+  table{width:100%;border-collapse:collapse;font-size:.85em;background:#fff;border:3px solid #000;border-radius:8px;overflow:hidden;}
+  th,td{padding:8px 8px;text-align:left;border-bottom:2px solid #eee;}
+  th{background:var(--dark);color:#fff;font-weight:800;font-size:.82em;}
   tr.me{background:linear-gradient(90deg,#fff3cd,#ffe0b2);font-weight:800;}
   tr:last-child td{border-bottom:none;}
-  .rank-badge{display:inline-block;min-width:28px;padding:2px 6px;border-radius:6px;background:var(--orange);color:#fff;
-    font-weight:900;text-align:center;font-size:.85em;}
+  .rank-badge{display:inline-block;min-width:26px;padding:2px 6px;border-radius:6px;background:var(--orange);color:#fff;
+    font-weight:900;text-align:center;font-size:.82em;}
   .rank-badge.gold{background:#f9a825;} .rank-badge.silver{background:#9e9e9e;} .rank-badge.bronze{background:#a1887f;}
 
   .post{border-bottom:2px dashed #ccc;padding:10px 0;content-visibility:auto;contain-intrinsic-size:80px;}
   .post:last-child{border-bottom:none;}
-  .post-meta{font-size:.78em;color:#555;}
-  .empty{color:#666;font-style:italic;font-size:.9em;}
-  .err{color:#c00;font-weight:700;margin-top:10px;word-break:break-word;}
-  .ok{color:#2e7d32;font-weight:700;margin-top:10px;}
-  .team-dp{width:56px;height:56px;border:3px solid #000;border-radius:8px;image-rendering:pixelated;background:#fff;}
+  .post-meta{font-size:.76em;color:#555;}
+  .empty{color:#666;font-style:italic;font-size:.88em;}
+  .err{color:#c00;font-weight:700;margin-top:8px;word-break:break-word;font-size:.9em;}
+  .ok{color:#2e7d32;font-weight:700;margin-top:8px;font-size:.9em;}
+  .team-dp{width:52px;height:52px;border:3px solid #000;border-radius:8px;image-rendering:pixelated;background:#fff;flex-shrink:0;}
   .banner{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;text-shadow:1px 1px 0 #000;
-    padding:14px 18px;border:4px solid #000;border-radius:12px;box-shadow:6px 6px 0 rgba(0,0,0,.35);margin-bottom:16px;
-    display:flex;align-items:center;gap:14px;}
-  .banner h2{font-size:1.1em;}
+    padding:12px 14px;border:4px solid #000;border-radius:12px;box-shadow:5px 5px 0 rgba(0,0,0,.35);
+    margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+  .banner h2{font-size:1.05em;line-height:1.2;}
   .skeleton{animation:sk 1.2s ease-in-out infinite;}
   .sk-line{background:#ccc;border-radius:6px;height:14px;margin:8px 0;}
   @keyframes sk{0%,100%{opacity:1}50%{opacity:.5}}
 
-  #snakeOverlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;flex-direction:column;
-    justify-content:center;align-items:center;z-index:200;padding:10px;}
+  #snakeOverlay{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;flex-direction:column;
+    justify-content:center;align-items:center;z-index:200;padding:10px;touch-action:none;}
   #snakeOverlay.show{display:flex;}
-  #snakeCanvas{background:#111;border:4px solid var(--orange);max-width:90vw;max-height:60vh;touch-action:none;}
-  .game-label{color:#fff;font-family:'Courier New',monospace;margin-bottom:8px;font-size:1em;text-align:center;}
-  .game-score{color:var(--orange);font-family:'Courier New',monospace;font-size:1.3em;font-weight:900;margin-bottom:6px;}
-  .game-hint{color:#aaa;font-size:.82em;margin-top:10px;text-align:center;}
+  #snakeCanvas{background:#111;border:4px solid var(--orange);max-width:92vw;max-height:60vh;touch-action:none;}
+  .game-label{color:#fff;font-family:'Courier New',monospace;margin-bottom:6px;font-size:.95em;text-align:center;}
+  .game-score{color:var(--orange);font-family:'Courier New',monospace;font-size:1.2em;font-weight:900;margin-bottom:4px;}
+  .game-hint{color:#aaa;font-size:.78em;margin-top:8px;text-align:center;}
 
   @media(max-width:600px){
-    .brand-title{font-size:.7em;} .logo{height:38px;}
-    .container{padding:12px;} .card{padding:14px;}
-    .btn-row .btn{flex:1 1 45%;}
-    .stats-card{grid-template-columns:repeat(2,1fr);padding:12px;gap:8px;}
-    .stat-value{font-size:.95em;} .stat-label{font-size:.5em;}
+    .brand-title{font-size:.68em;} .logo{height:36px;}
+    .container{padding:10px;}
+    .card{padding:12px;}
+    .btn-row .btn{flex:1 1 46%;min-height:46px;padding:12px 14px;font-size:.9em;}
+    .stats-card{grid-template-columns:repeat(3,1fr);padding:10px;gap:6px;}
+    .stat-box:nth-child(4){grid-column:span 1;}
+    .stat-box:nth-child(5){grid-column:span 1;}
+    .stat-value{font-size:.9em;} .stat-label{font-size:.45em;}
+    .team-dp{width:44px;height:44px;}
+    table{font-size:.78em;}
+    th,td{padding:6px 6px;}
+    .user-info span{max-width:80px;}
+  }
+  @media(max-width:380px){
+    .brand-title{display:none;}
   }
 </style>
 </head>
@@ -126,24 +142,25 @@
 
 <header>
   <div class="brand-wrap">
-    <img src="./LOGO.png" alt="ACI Careeredge Campus Lead" class="logo" onerror="this.style.display='none'">
+    <img src="./LOGO.png" alt="ACI" class="logo" onerror="this.style.display='none'">
     <span class="brand-title">ACI Careeredge<br>Campus Lead</span>
   </div>
   <div class="user-info" id="userInfo" style="display:none;">
     <span id="headerName"></span>
-    <a id="adminLink" href="admin.html" style="display:none;color:#fff;background:#c62828;padding:4px 10px;border-radius:20px;font-weight:800;font-size:.85em;text-decoration:none;border:2px solid #000;box-shadow:2px 2px 0 #000;">⚙️ Admin</a>
-    <button class="btn btn-warn" onclick="logout()">Logout</button>
+    <a id="adminLink" href="admin.html" style="display:none;color:#fff;background:#c62828;padding:4px 9px;border-radius:20px;font-weight:800;font-size:.75em;text-decoration:none;border:2px solid #000;box-shadow:2px 2px 0 #000;">⚙️</a>
+    <button class="btn btn-warn" style="padding:6px 10px;min-height:0;font-size:.78em;" onclick="logout()">Logout</button>
   </div>
 </header>
 
 <div class="container">
-  <div id="loginView" class="card" style="max-width:440px;margin:60px auto;">
+  <div id="loginView" class="card" style="max-width:440px;margin:40px auto;">
     <h2>🎓 ACI Careeredge</h2>
-    <p style="margin-bottom:14px;font-size:.9em;color:#555;">Enter your email and CL Code to continue.</p>
+    <p style="margin-bottom:14px;font-size:.88em;color:#555;">Enter your email and CL Code to continue.</p>
     <label>Email</label>
-    <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+    <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" autocapitalize="off" spellcheck="false">
     <label>CL Code</label>
     <input type="text" id="loginCode" placeholder="CL0103" autocomplete="username" maxlength="12"
+           autocapitalize="characters" spellcheck="false"
            style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-weight:700;">
     <button class="btn btn-primary" style="width:100%;" id="loginBtn" onclick="handleLogin(this)">Enter</button>
     <p id="loginError" class="err"></p>
@@ -153,9 +170,9 @@
   <div id="mainView" style="display:none;">
     <div class="banner">
       <img id="myTeamDP" class="team-dp" alt="">
-      <div>
+      <div style="min-width:0;">
         <h2 id="welcomeTitle">Welcome!</h2>
-        <div style="font-size:.85em;opacity:.9;" id="welcomeSub"></div>
+        <div style="font-size:.82em;opacity:.95;" id="welcomeSub"></div>
       </div>
     </div>
 
@@ -168,7 +185,7 @@
     </div>
 
     <div class="btn-row">
-      <a class="btn btn-primary" id="goTeamBtn" href="#">🎯 My Team Dashboard</a>
+      <a class="btn btn-primary" id="goTeamBtn" href="#" style="text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">🎯 My Team</a>
       <button class="btn btn-secondary" onclick="refreshAll(this)">🔄 Refresh</button>
     </div>
 
@@ -187,7 +204,7 @@
       <h3>🌍 Global Feed</h3>
       <textarea id="globalMsg" rows="3" maxlength="800" placeholder="Share a thought with the campus…"></textarea>
       <button class="btn btn-warn" style="width:100%;" onclick="postGlobal(this)">📣 Post to Global</button>
-      <div id="globalBox" style="margin-top:14px;"></div>
+      <div id="globalBox" style="margin-top:12px;"></div>
     </div>
   </div>
 </div>
@@ -195,8 +212,8 @@
 <div id="snakeOverlay">
   <div class="game-label">🎓 Loading…</div>
   <div class="game-score">Score: <span id="snakeScore">0</span></div>
-  <canvas id="snakeCanvas" width="360" height="360"></canvas>
-  <div class="game-hint">Arrow keys (PC) · Swipe (Mobile)</div>
+  <canvas id="snakeCanvas" width="320" height="320"></canvas>
+  <div class="game-hint">Tap arrows or swipe to play</div>
 </div>
 
 <script>
@@ -215,11 +232,14 @@
   }, {capture:true});
 })();
 
-window.addEventListener('scroll', function(){
-  var y = window.pageYOffset;
-  document.getElementById('sky').style.transform = 'translateY(' + (y * 0.35) + 'px)';
-  document.getElementById('clouds').style.transform = 'translateY(' + (y * 0.6) + 'px)';
-}, {passive:true});
+var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+if (!isMobile){
+  window.addEventListener('scroll', function(){
+    var y = window.pageYOffset;
+    document.getElementById('sky').style.transform = 'translateY(' + (y * 0.35) + 'px)';
+    document.getElementById('clouds').style.transform = 'translateY(' + (y * 0.6) + 'px)';
+  }, {passive:true});
+}
 
 var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
 var $ = function(id){ return document.getElementById(id); };
@@ -245,15 +265,15 @@ function startSnake(myId){
   var canvas = oldCanvas.cloneNode(true);
   oldCanvas.parentNode.replaceChild(canvas, oldCanvas);
   var ctx = canvas.getContext('2d');
-  var GRID = 18;
+  var GRID = 16;
   var SIZE = canvas.width / GRID;
   var codes = ['1','2','3','4','5','6','7','8'];
   var imgs = codes.map(function(c){ var i = new Image(); i.src = './' + c + '.png'; return i; });
 
   var state = {
-    snake: [{x:9,y:9},{x:8,y:9},{x:7,y:9}],
+    snake: [{x:8,y:8},{x:7,y:8},{x:6,y:8}],
     dir: {x:1,y:0},
-    food: {x:13,y:9,idx:0},
+    food: {x:12,y:8,idx:0},
     score: 0, over: false
   };
   function placeFood(){
@@ -286,8 +306,6 @@ function startSnake(myId){
       ctx.fillStyle = '#ff8c00';
       ctx.fillRect(state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
     }
-    ctx.strokeStyle = '#ff8c00';
-    ctx.strokeRect(state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
     $('snakeScore').textContent = state.score;
   }
   function step(){
@@ -299,10 +317,10 @@ function startSnake(myId){
       state.over = true;
       setTimeout(function(){
         if (myId !== snakeGameId) return;
-        state.snake = [{x:9,y:9},{x:8,y:9},{x:7,y:9}];
+        state.snake = [{x:8,y:8},{x:7,y:8},{x:6,y:8}];
         state.dir = {x:1,y:0}; state.score = 0; state.over = false;
         placeFood();
-      }, 800);
+      }, 700);
       return;
     }
     state.snake.unshift(head);
@@ -345,7 +363,7 @@ function startSnake(myId){
       return;
     }
     step();
-  }, 140);
+  }, 160);
 
   placeFood();
   draw();
@@ -361,7 +379,7 @@ function api(action, payload){
     body: body, redirect: 'follow', cache: 'no-store'
   }).then(function(res){
     return res.text().then(function(text){
-      if (!text) throw new Error('Empty response from server.');
+      if (!text) throw new Error('Empty response.');
       try { return JSON.parse(text); }
       catch (je){
         if (text.indexOf('<html') >= 0 || text.indexOf('<!DOCTYPE') >= 0)
@@ -381,12 +399,12 @@ var snakeShown = false;
 function withSnake(fn){
   var timer = setTimeout(function(){
     if (!snakeShown){ snakeShown = true; showSnake(); }
-  }, 400);
+  }, 450);
   return Promise.resolve().then(fn).finally(function(){
     clearTimeout(timer);
     if (snakeShown){
       snakeShown = false;
-      setTimeout(hideSnake, 200);
+      setTimeout(hideSnake, 180);
     }
   });
 }
@@ -409,12 +427,8 @@ function handleLogin(btn){
       sessionStorage.setItem('aci_team_user', JSON.stringify(user));
       enterApp();
     })
-    .catch(function(e){
-      $('loginError').textContent = e.message || 'Connection failed.';
-    })
-    .finally(function(){
-      btn.disabled = false; btn.textContent = orig;
-    });
+    .catch(function(e){ $('loginError').textContent = e.message || 'Connection failed.'; })
+    .finally(function(){ btn.disabled = false; btn.textContent = orig; });
 }
 function logout(){
   localStorage.removeItem(LS_USER);
@@ -447,9 +461,7 @@ function enterApp(){
     dp.style.visibility = 'hidden';
   }
   $('goTeamBtn').href = 'team.html?t=' + user.teamNumber;
-  if (!user.teamNumber || user.teamNumber === 0) {
-    $('goTeamBtn').style.display = 'none';
-  }
+  if (!user.teamNumber || user.teamNumber === 0) $('goTeamBtn').style.display = 'none';
   loadBootstrap();
 }
 
@@ -473,9 +485,7 @@ function loadBootstrap(){
 function refreshAll(btn){
   var o = btn.textContent;
   btn.disabled = true; btn.textContent = 'Loading…';
-  loadBootstrap().then(function(){
-    btn.disabled = false; btn.textContent = o;
-  });
+  loadBootstrap().then(function(){ btn.disabled = false; btn.textContent = o; });
 }
 function paintStats(s){
   $('statDay').textContent   = s.day;
@@ -484,8 +494,6 @@ function paintStats(s){
   $('statTotal').textContent = s.total;
   $('statTeam').textContent  = s.teamMonth;
 }
-
-/* ---------- MONTHS ---------- */
 function prettyMonth(m){
   var parts = m.split('-');
   var names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -506,19 +514,12 @@ function switchMonth(m){
   $('indLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
   $('teamLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
   withSnake(function(){ return api('getLeaderboards', {month: m}); })
-    .then(function(r){
-      if (r.success){
-        renderIndividual(r.individual);
-        renderTeam(r.team);
-      }
-    })
+    .then(function(r){ if (r.success){ renderIndividual(r.individual); renderTeam(r.team); } })
     .catch(function(){});
 }
-
-/* ---------- RENDER ---------- */
 function renderIndividual(list){
   if (!list || !list.length){ $('indLbBox').innerHTML = '<p class="empty">No scores this month.</p>'; return; }
-  var p = ['<table><thead><tr><th>#</th><th>Name</th><th>Team</th><th>Points</th></tr></thead><tbody>'];
+  var p = ['<table><thead><tr><th>#</th><th>Name</th><th>Team</th><th>Pts</th></tr></thead><tbody>'];
   for (var i = 0; i < list.length; i++){
     var u = list[i];
     var me = user && u.code === user.code ? ' class="me"' : '';
@@ -531,13 +532,12 @@ function renderIndividual(list){
 }
 function renderTeam(list){
   if (!list || !list.length){ $('teamLbBox').innerHTML = '<p class="empty">No scores this month.</p>'; return; }
-  var p = ['<table><thead><tr><th>#</th><th>Team</th><th>Points</th></tr></thead><tbody>'];
+  var p = ['<table><thead><tr><th>#</th><th>Team</th><th>Pts</th></tr></thead><tbody>'];
   for (var i = 0; i < list.length; i++){
     var t = list[i];
     var me = user && t.teamNumber === user.teamNumber ? ' class="me"' : '';
     p.push('<tr' + me + '><td><span class="rank-badge ' + badge(t.rank) + '">' + t.rank + '</span></td>' +
-      '<td>' + esc(t.teamName) + ' <span style="color:#666;font-size:.8em;">(Team ' + t.teamNumber + ')</span></td>' +
-      '<td><strong>' + t.points + '</strong></td></tr>');
+      '<td>' + esc(t.teamName) + '</td><td><strong>' + t.points + '</strong></td></tr>');
   }
   p.push('</tbody></table>');
   $('teamLbBox').innerHTML = p.join('');
@@ -550,8 +550,8 @@ function renderGlobal(data){
     var a = anns[i];
     var dt = new Date(a.timestamp).toLocaleString();
     p.push('<div style="background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;border:3px solid #000;' +
-      'border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:4px 4px 0 rgba(0,0,0,.35);text-shadow:1px 1px 0 rgba(0,0,0,.3);">' +
-      '<div style="font-size:.75em;opacity:.9;margin-bottom:4px;">📢 <strong>Announcement</strong> · ' + esc(a.name) + ' · ' + dt + '</div>' +
+      'border-radius:10px;padding:10px;margin-bottom:8px;box-shadow:3px 3px 0 rgba(0,0,0,.35);text-shadow:1px 1px 0 rgba(0,0,0,.3);">' +
+      '<div style="font-size:.72em;opacity:.9;margin-bottom:3px;">📢 <strong>Announcement</strong> · ' + esc(a.name) + ' · ' + dt + '</div>' +
       '<div style="font-weight:700;">' + esc(a.message) + '</div></div>');
   }
   for (var j = 0; j < posts.length; j++){
