@@ -131,6 +131,7 @@
   </div>
   <div class="user-info" id="userInfo" style="display:none;">
     <span id="headerName"></span>
+    <a id="adminLink" href="admin.html" style="display:none;color:#fff;background:#c62828;padding:4px 10px;border-radius:20px;font-weight:800;font-size:.85em;text-decoration:none;border:2px solid #000;box-shadow:2px 2px 0 #000;">⚙️ Admin</a>
     <button class="btn btn-warn" onclick="logout()">Logout</button>
   </div>
 </header>
@@ -142,7 +143,7 @@
     <label>Email</label>
     <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
     <label>CL Code</label>
-    <input type="text" id="loginCode" placeholder="CL0000" autocomplete="username" maxlength="12"
+    <input type="text" id="loginCode" placeholder="CL0103" autocomplete="username" maxlength="12"
            style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-weight:700;">
     <button class="btn btn-primary" style="width:100%;" id="loginBtn" onclick="handleLogin(this)">Enter</button>
     <p id="loginError" class="err"></p>
@@ -227,7 +228,7 @@ var user = null;
 var currentMonth = '';
 var monthsList = [];
 
-/* ---------- SNAKE (singleton, no glitch) ---------- */
+/* ---------- SNAKE ---------- */
 var snakeGameId = 0;
 function showSnake(){
   snakeGameId++;
@@ -435,12 +436,20 @@ function enterApp(){
   $('mainView').style.display = 'block';
   $('userInfo').style.display = 'flex';
   $('headerName').textContent = user.name + ' (' + user.code + ')';
+  $('adminLink').style.display = user.isAdmin ? 'inline-block' : 'none';
   $('welcomeTitle').textContent = 'Hi ' + user.name + '!';
   $('welcomeSub').textContent = user.teamName + ' — ' + user.code;
   var dp = $('myTeamDP');
-  dp.src = './' + user.teamNumber + '.png';
-  dp.onerror = function(){ this.style.visibility = 'hidden'; };
+  if (user.teamNumber && user.teamNumber > 0){
+    dp.src = './' + user.teamNumber + '.png';
+    dp.onerror = function(){ this.style.visibility = 'hidden'; };
+  } else {
+    dp.style.visibility = 'hidden';
+  }
   $('goTeamBtn').href = 'team.html?t=' + user.teamNumber;
+  if (!user.teamNumber || user.teamNumber === 0) {
+    $('goTeamBtn').style.display = 'none';
+  }
   loadBootstrap();
 }
 
@@ -457,7 +466,7 @@ function loadBootstrap(){
         renderIndividual(r.leaderboards.individual);
         renderTeam(r.leaderboards.team);
       }
-      if (r.global) renderGlobal(r.global.posts);
+      if (r.global) renderGlobal(r.global);
     })
     .catch(function(e){ console.error(e); });
 }
@@ -533,16 +542,26 @@ function renderTeam(list){
   p.push('</tbody></table>');
   $('teamLbBox').innerHTML = p.join('');
 }
-function renderGlobal(list){
-  if (!list || !list.length){ $('globalBox').innerHTML = '<p class="empty">No posts yet. Be the first!</p>'; return; }
+function renderGlobal(data){
+  var anns = (data && data.announcements) || [];
+  var posts = (data && data.posts) || [];
   var p = [];
-  for (var i = 0; i < list.length; i++){
-    var g = list[i];
-    var dt = new Date(g.timestamp).toLocaleString();
+  for (var i = 0; i < anns.length; i++){
+    var a = anns[i];
+    var dt = new Date(a.timestamp).toLocaleString();
+    p.push('<div style="background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;border:3px solid #000;' +
+      'border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:4px 4px 0 rgba(0,0,0,.35);text-shadow:1px 1px 0 rgba(0,0,0,.3);">' +
+      '<div style="font-size:.75em;opacity:.9;margin-bottom:4px;">📢 <strong>Announcement</strong> · ' + esc(a.name) + ' · ' + dt + '</div>' +
+      '<div style="font-weight:700;">' + esc(a.message) + '</div></div>');
+  }
+  for (var j = 0; j < posts.length; j++){
+    var g = posts[j];
+    var dt2 = new Date(g.timestamp).toLocaleString();
     p.push('<div class="post"><div class="post-meta"><strong>' + esc(g.name) + '</strong> · ' +
-      esc(g.teamName) + ' · ' + dt + '</div>' +
+      esc(g.teamName) + ' · ' + dt2 + '</div>' +
       '<div style="margin-top:4px;">' + esc(g.message) + '</div></div>');
   }
+  if (!p.length) p.push('<p class="empty">No posts yet. Be the first!</p>');
   $('globalBox').innerHTML = p.join('');
 }
 function postGlobal(btn){
@@ -554,7 +573,7 @@ function postGlobal(btn){
     .then(function(r){
       if (!r.success){ alert(r.message || 'Failed.'); return; }
       $('globalMsg').value = '';
-      return api('getGlobalPosts').then(function(g){ renderGlobal(g.posts); });
+      return api('getGlobalPosts').then(function(g){ renderGlobal(g); });
     })
     .catch(function(e){ alert(e.message || 'Failed.'); })
     .finally(function(){ btn.disabled = false; btn.textContent = o; });
