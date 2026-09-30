@@ -8,25 +8,43 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 <link rel="preload" as="image" href="./LOGO.png">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0a3d62;--ground:#1e3799;--card:rgba(255,255,255,.96);--accent:#f39c12;--text:#0d1b2a;}
+  :root{--bg:#1bddff;--ground:#2e7d32;--card:rgba(255,255,255,.94);--orange:#ff8c00;--text:#1a1a1a;--dark:#0d2b3e;}
   *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent;}
-  html,body{background:var(--bg);min-height:100vh;overflow-x:hidden;color:var(--text);user-select:none;-webkit-user-select:none;-ms-user-select:none;}
-  input,textarea,select{user-select:text;-webkit-user-select:text;-ms-user-select:text;}
-  img{-webkit-user-drag:none;user-drag:none;pointer-events:none;}
-  #sky{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,#0a3d62,#1e3799 55%,#3c6382);}
+  html,body{background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;user-select:none;-webkit-user-select:none;}
+  input,textarea,select{user-select:text;-webkit-user-select:text;}
+  img{-webkit-user-drag:none;pointer-events:none;}
+
+  #sky{position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(circle at 20% 20%, #fff6 0 4px, transparent 5px),
+      radial-gradient(circle at 70% 40%, #fff6 0 6px, transparent 7px),
+      radial-gradient(circle at 40% 70%, #fff4 0 3px, transparent 4px),
+      radial-gradient(circle at 85% 15%, #fff5 0 5px, transparent 6px),
+      linear-gradient(180deg, #1bddff 0%, #45e3ff 60%, #a8f0ff 100%);
+    background-size:200px 200px,300px 300px,150px 150px,250px 250px,100% 100%;
+    will-change:transform;}
+  #clouds{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:
+      radial-gradient(ellipse 80px 30px at 15% 15%, #fff, transparent 70%),
+      radial-gradient(ellipse 100px 35px at 60% 25%, #fff, transparent 70%),
+      radial-gradient(ellipse 70px 25px at 35% 45%, #fff, transparent 70%);
+    opacity:.55;will-change:transform;}
   #ground{position:fixed;bottom:0;left:0;width:100%;height:120px;z-index:-1;background:var(--ground);
-    box-shadow:inset 0 6px 0 #0c2461,inset 0 -10px 0 #061a40;
-    background-image:repeating-linear-gradient(90deg,#1e3799 0 40px,#152a78 40px 80px);}
+    box-shadow:inset 0 6px 0 #1b5e20,inset 0 -10px 0 #1b3d12;
+    background-image:repeating-linear-gradient(90deg,#2e7d32 0 40px,#276b2b 40px 80px);}
+
   header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;
-    background:rgba(0,0,0,.45);backdrop-filter:blur(6px);border-bottom:4px solid #000;
-    position:sticky;top:0;z-index:50;will-change:transform;}
-  .logo{height:46px;image-rendering:pixelated;pointer-events:none;}
+    background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border-bottom:4px solid #000;
+    position:sticky;top:0;z-index:50;}
   .brand-wrap{display:flex;align-items:center;gap:12px;}
-  .brand-title{font-family:'Press Start 2P',monospace;font-size:0.9em;color:#fff;
-    text-shadow:2px 2px 0 #000,3px 3px 0 var(--accent);letter-spacing:1px;line-height:1.3;}
+  .logo{height:46px;image-rendering:pixelated;}
+  .brand-title{font-family:'Press Start 2P',monospace;font-size:.9em;color:#fff;
+    text-shadow:2px 2px 0 #000,4px 4px 0 #ff8c00;letter-spacing:1px;line-height:1.3;
+    -webkit-font-smoothing:none;}
   .user-info{display:flex;align-items:center;gap:12px;color:#fff;font-weight:700;font-size:.9em;}
+
   .container{max-width:820px;margin:0 auto;padding:18px;}
   .card{background:var(--card);border:4px solid #000;border-radius:12px;padding:18px;margin-bottom:16px;
     box-shadow:6px 6px 0 rgba(0,0,0,.35);}
@@ -37,36 +55,52 @@
     background:#fff;color:#000;box-shadow:3px 3px 0 #000;transition:transform .06s;}
   .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000;}
   .btn:disabled{opacity:.6;cursor:wait;}
-  .btn-primary{background:#1e3799;color:#fff;}
-  .btn-warn{background:var(--accent);color:#fff;}
+  .btn-primary{background:var(--ground);color:#fff;}
+  .btn-warn{background:var(--orange);color:#fff;}
   .btn-secondary{background:#b0bec5;}
   .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
   table{width:100%;border-collapse:collapse;font-size:.88em;background:#fff;border:3px solid #000;border-radius:8px;overflow:hidden;}
   th,td{padding:8px 10px;text-align:left;border-bottom:2px solid #eee;}
-  th{background:#0d1b2a;color:#fff;font-weight:800;font-size:.85em;}
+  th{background:var(--dark);color:#fff;font-weight:800;font-size:.85em;}
   tr.me{background:linear-gradient(90deg,#fff3cd,#ffe0b2);font-weight:800;}
   tr:last-child td{border-bottom:none;}
-  .rank-badge{display:inline-block;min-width:28px;padding:2px 6px;border-radius:6px;background:var(--accent);color:#fff;
+  .rank-badge{display:inline-block;min-width:28px;padding:2px 6px;border-radius:6px;background:var(--orange);color:#fff;
     font-weight:900;text-align:center;font-size:.85em;}
   .rank-badge.gold{background:#f9a825;} .rank-badge.silver{background:#9e9e9e;} .rank-badge.bronze{background:#a1887f;}
   .post{border-bottom:2px dashed #ccc;padding:10px 0;content-visibility:auto;contain-intrinsic-size:80px;}
   .post:last-child{border-bottom:none;}
   .post-meta{font-size:.78em;color:#555;}
   .empty{color:#666;font-style:italic;font-size:.9em;}
-  .err{color:#c00;font-weight:700;margin-top:10px;}
+  .err{color:#c00;font-weight:700;margin-top:10px;word-break:break-word;}
+  .ok{color:#2e7d32;font-weight:700;margin-top:10px;}
   .team-dp{width:56px;height:56px;border:3px solid #000;border-radius:8px;image-rendering:pixelated;background:#fff;}
-  .banner{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;text-shadow:1px 1px 0 #000;
+  .banner{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;text-shadow:1px 1px 0 #000;
     padding:14px 18px;border:4px solid #000;border-radius:12px;box-shadow:6px 6px 0 rgba(0,0,0,.35);margin-bottom:16px;
     display:flex;align-items:center;gap:14px;}
   .banner h2{font-size:1.1em;}
   .skeleton{animation:sk 1.2s ease-in-out infinite;}
   .sk-line{background:#ccc;border-radius:6px;height:14px;margin:8px 0;}
   @keyframes sk{0%,100%{opacity:1}50%{opacity:.5}}
-  @media(max-width:600px){.brand-title{font-size:.65em;} .container{padding:12px;} .logo{height:38px;}}
+
+  #snakeOverlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;flex-direction:column;
+    justify-content:center;align-items:center;z-index:200;padding:10px;}
+  #snakeOverlay.show{display:flex;}
+  #snakeCanvas{background:#111;border:4px solid var(--orange);max-width:90vw;max-height:60vh;touch-action:none;}
+  .game-label{color:#fff;font-family:'Courier New',monospace;margin-bottom:8px;font-size:1em;text-align:center;}
+  .game-score{color:var(--orange);font-family:'Courier New',monospace;font-size:1.3em;font-weight:900;margin-bottom:6px;}
+  .game-hint{color:#aaa;font-size:.82em;margin-top:10px;text-align:center;}
+
+  @media(max-width:600px){
+    .brand-title{font-size:.7em;} .logo{height:38px;}
+    .container{padding:12px;} .card{padding:14px;}
+    .btn-row .btn{flex:1 1 45%;}
+  }
 </style>
 </head>
 <body>
+
 <div id="sky"></div>
+<div id="clouds"></div>
 <div id="ground"></div>
 
 <header>
@@ -82,7 +116,7 @@
 
 <div class="container">
   <div id="loginView" class="card" style="max-width:440px;margin:60px auto;">
-    <h2>🎓 Login</h2>
+    <h2>🎓 ACI Careeredge</h2>
     <p style="margin-bottom:14px;font-size:.9em;color:#555;">Enter your email and CL Code to continue.</p>
     <label>Email</label>
     <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
@@ -91,6 +125,7 @@
            style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-weight:700;">
     <button class="btn btn-primary" style="width:100%;" id="loginBtn" onclick="handleLogin(this)">Enter</button>
     <p id="loginError" class="err"></p>
+    <p id="loginOk" class="ok"></p>
   </div>
 
   <div id="mainView" style="display:none;">
@@ -116,177 +151,327 @@
   </div>
 </div>
 
+<div id="snakeOverlay">
+  <div class="game-label">🎓 Loading…</div>
+  <div class="game-score">Score: <span id="snakeScore">0</span></div>
+  <canvas id="snakeCanvas" width="360" height="360"></canvas>
+  <div class="game-hint">Arrow keys (PC) · Swipe (Mobile)</div>
+</div>
+
 <script>
-/* ========== LOCKDOWN ========== */
 (function lockDown(){
-  // No right-click
-  document.addEventListener('contextmenu', e => e.preventDefault(), { capture:true });
-
-  // Block F12, Ctrl+Shift+I/J/C/K, Ctrl+U/S/P, Ctrl+Shift+Delete
-  document.addEventListener('keydown', e => {
-    const k = (e.key || '').toUpperCase();
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, {capture:true});
+  document.addEventListener('keydown', function(e){
+    var k = (e.key || '').toUpperCase();
     if (k === 'F12') { e.preventDefault(); return false; }
-    if (e.ctrlKey && e.shiftKey && ['I','J','C','K','M'].includes(k)) { e.preventDefault(); return false; }
-    if (e.ctrlKey && ['U','S','P','A'].includes(k) && !(k === 'A' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA'))) {
-      e.preventDefault(); return false;
-    }
-    if (e.metaKey && e.altKey && ['I','J','C','U'].includes(k)) { e.preventDefault(); return false; }
-  }, { capture:true });
-
-  // Block drag of images/logo
-  document.addEventListener('dragstart', e => e.preventDefault(), { capture:true });
-
-  // Disable text selection via double-click (input/textarea allowed)
-  document.addEventListener('selectstart', e => {
-    const t = e.target.tagName;
+    if (e.ctrlKey && e.shiftKey && ['I','J','C','K','M'].indexOf(k) !== -1) { e.preventDefault(); return false; }
+    if (e.ctrlKey && ['U','S','P'].indexOf(k) !== -1) { e.preventDefault(); return false; }
+  }, {capture:true});
+  document.addEventListener('dragstart', function(e){ e.preventDefault(); }, {capture:true});
+  document.addEventListener('selectstart', function(e){
+    var t = e.target.tagName;
     if (t !== 'INPUT' && t !== 'TEXTAREA') e.preventDefault();
-  }, { capture:true });
-
-  // Discourage casual "view source"
-  window.addEventListener('keyup', e => {
-    if ((e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || e.key === 'F12') {
-      // Optional: document.body.innerHTML = ''; — too aggressive, leave soft
-    }
-  });
+  }, {capture:true});
 })();
 
-/* ========== APP ========== */
-const API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
-const $ = id => document.getElementById(id);
-const LS_USER = 'aci_user', LS_LB = 'aci_lb', LS_GLOBAL = 'aci_global';
-let user = null;
+window.addEventListener('scroll', function(){
+  var y = window.pageYOffset;
+  document.getElementById('sky').style.transform = 'translateY(' + (y * 0.35) + 'px)';
+  document.getElementById('clouds').style.transform = 'translateY(' + (y * 0.6) + 'px)';
+}, {passive:true});
 
-async function api(action, payload) {
+var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
+var $ = function(id){ return document.getElementById(id); };
+var LS_USER = 'aci_user', LS_LB = 'aci_lb', LS_GLOBAL = 'aci_global';
+var user = null;
+
+/* ---------- SNAKE LOADER ---------- */
+var snakeTick = null, snakeKeyHandler = null;
+function showSnake(){
+  $('snakeOverlay').classList.add('show');
+  startSnake();
+}
+function hideSnake(){
+  $('snakeOverlay').classList.remove('show');
+  if (snakeTick) { clearInterval(snakeTick); snakeTick = null; }
+  if (snakeKeyHandler) { document.removeEventListener('keydown', snakeKeyHandler); snakeKeyHandler = null; }
+}
+function startSnake(){
+  var canvas = $('snakeCanvas');
+  var ctx = canvas.getContext('2d');
+  var GRID = 18;
+  var SIZE = canvas.width / GRID;
+  var codes = ['1','2','3','4','5','6','7','8'];
+  var imgs = codes.map(function(c){ var i = new Image(); i.src = './' + c + '.png'; return i; });
+
+  var state = {
+    snake: [{x:9,y:9},{x:8,y:9},{x:7,y:9}],
+    dir: {x:1,y:0},
+    food: {x:13,y:9,idx:0},
+    score: 0, over: false
+  };
+  function placeFood(){
+    var attempts = 0;
+    do {
+      state.food.x = Math.floor(Math.random() * GRID);
+      state.food.y = Math.floor(Math.random() * GRID);
+      state.food.idx = (state.food.idx + 1) % imgs.length;
+      attempts++;
+    } while (state.snake.some(function(s){ return s.x === state.food.x && s.y === state.food.y; }) && attempts < 50);
+  }
+  function draw(){
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#1f1f1f';
+    for (var i = 0; i <= GRID; i++){
+      ctx.beginPath(); ctx.moveTo(i*SIZE, 0); ctx.lineTo(i*SIZE, canvas.height); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, i*SIZE); ctx.lineTo(canvas.width, i*SIZE); ctx.stroke();
+    }
+    state.snake.forEach(function(s, i){
+      ctx.fillStyle = (i === 0) ? '#ff8c00' : '#2e7d32';
+      ctx.fillRect(s.x*SIZE+1, s.y*SIZE+1, SIZE-2, SIZE-2);
+      ctx.strokeStyle = '#000';
+      ctx.strokeRect(s.x*SIZE+1, s.y*SIZE+1, SIZE-2, SIZE-2);
+    });
+    var img = imgs[state.food.idx];
+    if (img.complete && img.naturalWidth){
+      ctx.drawImage(img, state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
+    } else {
+      ctx.fillStyle = '#ff8c00';
+      ctx.fillRect(state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
+    }
+    ctx.strokeStyle = '#ff8c00';
+    ctx.strokeRect(state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
+    $('snakeScore').textContent = state.score;
+  }
+  function step(){
+    if (state.over) return;
+    var head = { x: state.snake[0].x + state.dir.x, y: state.snake[0].y + state.dir.y };
+    if (head.x < 0 || head.y < 0 || head.x >= GRID || head.y >= GRID ||
+        state.snake.some(function(s){ return s.x === head.x && s.y === head.y; })){
+      state.over = true;
+      setTimeout(function(){
+        state.snake = [{x:9,y:9},{x:8,y:9},{x:7,y:9}];
+        state.dir = {x:1,y:0}; state.score = 0; state.over = false;
+        placeFood();
+      }, 800);
+      return;
+    }
+    state.snake.unshift(head);
+    if (head.x === state.food.x && head.y === state.food.y){ state.score++; placeFood(); }
+    else state.snake.pop();
+    draw();
+  }
+  snakeKeyHandler = function(e){
+    var k = e.key;
+    if (k === 'ArrowUp'    && state.dir.y === 0) state.dir = {x:0,y:-1};
+    if (k === 'ArrowDown'  && state.dir.y === 0) state.dir = {x:0,y:1};
+    if (k === 'ArrowLeft'  && state.dir.x === 0) state.dir = {x:-1,y:0};
+    if (k === 'ArrowRight' && state.dir.x === 0) state.dir = {x:1,y:0};
+    if (k.indexOf('Arrow') === 0) e.preventDefault();
+  };
+  document.addEventListener('keydown', snakeKeyHandler);
+  var tsX = 0, tsY = 0;
+  canvas.addEventListener('touchstart', function(e){
+    tsX = e.touches[0].clientX; tsY = e.touches[0].clientY;
+  }, {passive:true});
+  canvas.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - tsX;
+    var dy = e.changedTouches[0].clientY - tsY;
+    if (Math.abs(dx) > Math.abs(dy)){
+      if (dx > 0 && state.dir.x === 0) state.dir = {x:1,y:0};
+      else if (dx < 0 && state.dir.x === 0) state.dir = {x:-1,y:0};
+    } else {
+      if (dy > 0 && state.dir.y === 0) state.dir = {x:0,y:1};
+      else if (dy < 0 && state.dir.y === 0) state.dir = {x:0,y:-1};
+    }
+  }, {passive:true});
+  snakeTick = setInterval(step, 140);
+  placeFood();
+  draw();
+}
+
+/* ---------- API ---------- */
+function api(action, payload){
   payload = payload || {};
-  const res = await fetch(API_URL, {
-    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body: JSON.stringify(Object.assign({action}, payload)),
-    redirect:'follow', cache:'no-store'
+  var body = JSON.stringify(Object.assign({action: action}, payload));
+  return fetch(API_URL, {
+    method: 'POST',
+    headers: {'Content-Type':'text/plain;charset=utf-8'},
+    body: body, redirect: 'follow', cache: 'no-store'
+  }).then(function(res){
+    return res.text().then(function(text){
+      if (!text) throw new Error('Empty response from server.');
+      try { return JSON.parse(text); }
+      catch (je){
+        if (text.indexOf('<html') >= 0 || text.indexOf('<!DOCTYPE') >= 0)
+          throw new Error('Deployment access must be set to "Anyone".');
+        throw new Error('Unexpected server response.');
+      }
+    });
   });
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
 }
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-const badge = r => r<=3 ? 'gold silver bronze'.split(' ')[r-1] : '';
+function esc(s){
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function badge(r){ return r <= 3 ? 'gold silver bronze'.split(' ')[r-1] : ''; }
 
-async function handleLogin(btn) {
-  const email = $('loginEmail').value.trim();
-  const code  = $('loginCode').value.trim();
+function withSnake(fn){
+  var shown = false;
+  var t = setTimeout(function(){ shown = true; showSnake(); }, 400);
+  return Promise.resolve().then(fn).finally(function(){
+    clearTimeout(t);
+    if (shown) setTimeout(hideSnake, 200);
+  });
+}
+
+/* ---------- LOGIN ---------- */
+function handleLogin(btn){
+  var email = $('loginEmail').value.trim();
+  var code  = $('loginCode').value.trim();
   $('loginError').textContent = '';
-  if (!email || !code) { $('loginError').textContent = 'Email and Code required.'; return; }
-  const orig = btn.textContent;
+  $('loginOk').textContent = '';
+  if (!email || !code){ $('loginError').textContent = 'Email and Code required.'; return; }
+  var orig = btn.textContent;
   btn.disabled = true; btn.textContent = 'Entering…';
-  try {
-    const r = await api('login', { email, code });
-    if (!r.success) { $('loginError').textContent = r.message; return; }
-    user = r.user;
-    localStorage.setItem(LS_USER, JSON.stringify(user));
-    sessionStorage.setItem('aci_team_user', JSON.stringify(user));
-    enterApp();
-  } catch (e) { $('loginError').textContent = 'Server error. Try again.'; }
-  finally { btn.disabled = false; btn.textContent = orig; }
+  withSnake(function(){ return api('login', { email: email, code: code }); })
+    .then(function(r){
+      if (!r.success){ $('loginError').textContent = r.message || 'Login failed.'; return; }
+      $('loginOk').textContent = 'Welcome ' + r.user.name + '!';
+      user = r.user;
+      localStorage.setItem(LS_USER, JSON.stringify(user));
+      sessionStorage.setItem('aci_team_user', JSON.stringify(user));
+      enterApp();
+    })
+    .catch(function(e){
+      $('loginError').textContent = e.message || 'Connection failed.';
+    })
+    .finally(function(){
+      btn.disabled = false; btn.textContent = orig;
+    });
 }
-function logout(){ localStorage.removeItem(LS_USER); sessionStorage.removeItem('aci_team_user'); location.reload(); }
+function logout(){
+  localStorage.removeItem(LS_USER);
+  sessionStorage.removeItem('aci_team_user');
+  location.reload();
+}
 
-window.addEventListener('load', () => {
-  const saved = localStorage.getItem(LS_USER);
-  if (saved) { try { user = JSON.parse(saved); enterApp(); } catch(e){ localStorage.removeItem(LS_USER); } }
-  fetch(API_URL + '?action=ping').catch(()=>{});
-}, { once:true });
+window.addEventListener('load', function(){
+  var saved = localStorage.getItem(LS_USER);
+  if (saved){
+    try { user = JSON.parse(saved); enterApp(); }
+    catch (e) { localStorage.removeItem(LS_USER); }
+  }
+  fetch(API_URL + '?action=ping', {cache:'no-store'}).catch(function(){});
+}, {once:true});
 
-function enterApp() {
+function enterApp(){
   $('loginView').style.display = 'none';
   $('mainView').style.display = 'block';
   $('userInfo').style.display = 'flex';
   $('headerName').textContent = user.name + ' (' + user.code + ')';
   $('welcomeTitle').textContent = 'Hi ' + user.name + '!';
   $('welcomeSub').textContent = user.teamName + ' — ' + user.code;
-  const dp = $('myTeamDP');
+  var dp = $('myTeamDP');
   dp.src = './' + user.teamNumber + '.png';
   dp.onerror = function(){ this.style.visibility = 'hidden'; };
   $('goTeamBtn').href = 'team.html?t=' + user.teamNumber;
   paintCached();
   loadBootstrap();
 }
-function paintCached() {
+function paintCached(){
   try {
-    const lb = JSON.parse(localStorage.getItem(LS_LB) || 'null');
-    if (lb) { renderIndividual(lb.individual); renderTeam(lb.team); }
-    const g = JSON.parse(localStorage.getItem(LS_GLOBAL) || 'null');
+    var lb = JSON.parse(localStorage.getItem(LS_LB) || 'null');
+    if (lb){ renderIndividual(lb.individual); renderTeam(lb.team); }
+    var g = JSON.parse(localStorage.getItem(LS_GLOBAL) || 'null');
     if (g) renderGlobal(g);
-  } catch(e){}
+  } catch (e) {}
 }
-async function loadBootstrap() {
-  if (!localStorage.getItem(LS_LB)) {
+function loadBootstrap(){
+  if (!localStorage.getItem(LS_LB)){
     $('indLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div></div>';
     $('teamLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
     $('globalBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
   }
-  try {
-    const r = await api('bootstrap', { code: user.code });
-    if (!r.success) return;
-    if (r.leaderboards) {
-      renderIndividual(r.leaderboards.individual);
-      renderTeam(r.leaderboards.team);
-      localStorage.setItem(LS_LB, JSON.stringify(r.leaderboards));
-    }
-    if (r.global) {
-      renderGlobal(r.global.posts);
-      localStorage.setItem(LS_GLOBAL, JSON.stringify(r.global.posts));
-    }
-  } catch (e) {}
+  withSnake(function(){ return api('bootstrap', {code: user.code}); })
+    .then(function(r){
+      if (!r.success) return;
+      if (r.leaderboards){
+        renderIndividual(r.leaderboards.individual);
+        renderTeam(r.leaderboards.team);
+        localStorage.setItem(LS_LB, JSON.stringify(r.leaderboards));
+      }
+      if (r.global){
+        renderGlobal(r.global.posts);
+        localStorage.setItem(LS_GLOBAL, JSON.stringify(r.global.posts));
+      }
+    })
+    .catch(function(){});
 }
-async function refreshAll(btn) {
-  const o = btn.textContent; btn.disabled = true; btn.textContent = 'Loading…';
-  localStorage.removeItem(LS_LB); localStorage.removeItem(LS_GLOBAL);
-  await loadBootstrap();
-  btn.disabled = false; btn.textContent = o;
+function refreshAll(btn){
+  var o = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Loading…';
+  localStorage.removeItem(LS_LB);
+  localStorage.removeItem(LS_GLOBAL);
+  loadBootstrap().then(function(){
+    btn.disabled = false; btn.textContent = o;
+  });
 }
-function renderIndividual(list) {
-  if (!list || !list.length) { $('indLbBox').innerHTML = '<p class="empty">No scores yet.</p>'; return; }
-  const p = ['<table><thead><tr><th>#</th><th>Name</th><th>Team</th><th>Points</th></tr></thead><tbody>'];
-  for (const u of list) {
-    const me = user && u.code === user.code ? ' class="me"' : '';
-    p.push('<tr'+me+'><td><span class="rank-badge '+badge(u.rank)+'">'+u.rank+'</span></td>'+
-      '<td>'+esc(u.name)+'<div style="font-size:.72em;color:#666;">'+esc(u.code)+'</div></td>'+
-      '<td>'+esc(u.teamName)+'</td><td><strong>'+u.points+'</strong></td></tr>');
+function renderIndividual(list){
+  if (!list || !list.length){ $('indLbBox').innerHTML = '<p class="empty">No scores yet.</p>'; return; }
+  var p = ['<table><thead><tr><th>#</th><th>Name</th><th>Team</th><th>Points</th></tr></thead><tbody>'];
+  for (var i = 0; i < list.length; i++){
+    var u = list[i];
+    var me = user && u.code === user.code ? ' class="me"' : '';
+    p.push('<tr' + me + '><td><span class="rank-badge ' + badge(u.rank) + '">' + u.rank + '</span></td>' +
+      '<td>' + esc(u.name) + '<div style="font-size:.72em;color:#666;">' + esc(u.code) + '</div></td>' +
+      '<td>' + esc(u.teamName) + '</td><td><strong>' + u.points + '</strong></td></tr>');
   }
-  p.push('</tbody></table>'); $('indLbBox').innerHTML = p.join('');
+  p.push('</tbody></table>');
+  $('indLbBox').innerHTML = p.join('');
 }
-function renderTeam(list) {
-  if (!list || !list.length) { $('teamLbBox').innerHTML = '<p class="empty">No scores yet.</p>'; return; }
-  const p = ['<table><thead><tr><th>#</th><th>Team</th><th>Points</th></tr></thead><tbody>'];
-  for (const t of list) {
-    const me = user && t.teamNumber === user.teamNumber ? ' class="me"' : '';
-    p.push('<tr'+me+'><td><span class="rank-badge '+badge(t.rank)+'">'+t.rank+'</span></td>'+
-      '<td>'+esc(t.teamName)+' <span style="color:#666;font-size:.8em;">(Team '+t.teamNumber+')</span></td>'+
-      '<td><strong>'+t.points+'</strong></td></tr>');
+function renderTeam(list){
+  if (!list || !list.length){ $('teamLbBox').innerHTML = '<p class="empty">No scores yet.</p>'; return; }
+  var p = ['<table><thead><tr><th>#</th><th>Team</th><th>Points</th></tr></thead><tbody>'];
+  for (var i = 0; i < list.length; i++){
+    var t = list[i];
+    var me = user && t.teamNumber === user.teamNumber ? ' class="me"' : '';
+    p.push('<tr' + me + '><td><span class="rank-badge ' + badge(t.rank) + '">' + t.rank + '</span></td>' +
+      '<td>' + esc(t.teamName) + ' <span style="color:#666;font-size:.8em;">(Team ' + t.teamNumber + ')</span></td>' +
+      '<td><strong>' + t.points + '</strong></td></tr>');
   }
-  p.push('</tbody></table>'); $('teamLbBox').innerHTML = p.join('');
+  p.push('</tbody></table>');
+  $('teamLbBox').innerHTML = p.join('');
 }
-function renderGlobal(list) {
-  if (!list || !list.length) { $('globalBox').innerHTML = '<p class="empty">No posts yet. Be the first!</p>'; return; }
-  const p = [];
-  for (const g of list) {
-    const dt = new Date(g.timestamp).toLocaleString();
-    p.push('<div class="post"><div class="post-meta"><strong>'+esc(g.name)+'</strong> · '+esc(g.teamName)+' · '+dt+'</div>'+
-      '<div style="margin-top:4px;">'+esc(g.message)+'</div></div>');
+function renderGlobal(list){
+  if (!list || !list.length){ $('globalBox').innerHTML = '<p class="empty">No posts yet. Be the first!</p>'; return; }
+  var p = [];
+  for (var i = 0; i < list.length; i++){
+    var g = list[i];
+    var dt = new Date(g.timestamp).toLocaleString();
+    p.push('<div class="post"><div class="post-meta"><strong>' + esc(g.name) + '</strong> · ' +
+      esc(g.teamName) + ' · ' + dt + '</div>' +
+      '<div style="margin-top:4px;">' + esc(g.message) + '</div></div>');
   }
   $('globalBox').innerHTML = p.join('');
 }
-async function postGlobal(btn) {
-  const msg = $('globalMsg').value.trim();
-  if (!msg) { alert('Type a message first.'); return; }
-  const o = btn.textContent; btn.disabled = true; btn.textContent = 'Posting…';
-  try {
-    const r = await api('submitGlobalPost', { code: user.code, message: msg });
-    if (!r.success) { alert(r.message || 'Failed.'); return; }
-    $('globalMsg').value = '';
-    const g = await api('getGlobalPosts');
-    renderGlobal(g.posts);
-    localStorage.setItem(LS_GLOBAL, JSON.stringify(g.posts));
-  } catch (e) { alert('Failed.'); }
-  finally { btn.disabled = false; btn.textContent = o; }
+function postGlobal(btn){
+  var msg = $('globalMsg').value.trim();
+  if (!msg){ alert('Type a message first.'); return; }
+  var o = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Posting…';
+  withSnake(function(){ return api('submitGlobalPost', {code: user.code, message: msg}); })
+    .then(function(r){
+      if (!r.success){ alert(r.message || 'Failed.'); return; }
+      $('globalMsg').value = '';
+      return api('getGlobalPosts').then(function(g){
+        renderGlobal(g.posts);
+        localStorage.setItem(LS_GLOBAL, JSON.stringify(g.posts));
+      });
+    })
+    .catch(function(e){ alert(e.message || 'Failed.'); })
+    .finally(function(){ btn.disabled = false; btn.textContent = o; });
 }
 </script>
 </body>
