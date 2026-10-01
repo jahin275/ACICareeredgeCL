@@ -731,3 +731,22 @@ document.addEventListener('click', function(e){
 
 <!-- FIREBASE REALTIME SUBSCRIBER -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+(function(){
+  if (!window.firebase) return;
+  firebase.initializeApp({
+    databaseURL: 'https://aci-careeredge-default-rtdb.asia-southeast1.firebasedatabase.app'
+  });
+  var lastTs = 0;
+  firebase.database().ref('snapshot').on('value', function(snap){
+    var data = snap.val();
+    if (!data || !data.ts || data.ts === lastTs) return;
+    lastTs = data.ts;
+    try { localStorage.setItem('aci_snapshot', JSON.stringify({ data: data, exp: Date.now() + 30*60*1000 })); } catch(e){}
+    if (typeof window.applySnapshotTeam === 'function') window.applySnapshotTeam(data);
+  });
+})();
+</script>
+</body>
+</html>
