@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0a3d62">
-<title>Work Submission — ACI CareerEDGE</title>
+<title>Work Submission — ACI CareerEDGE Campus Leadership Programme</title>
 <link rel="icon" href="./favicon.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 <link rel="preload" as="image" href="./LOGO.png">
-<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="/">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#1bddff;--ground:#2e7d32;--card:rgba(255,255,255,.94);--orange:#ff8c00;--text:#1a1a1a;--dark:#0d2b3e;}
@@ -96,7 +96,6 @@
   .switch button{flex:1;padding:10px;border:3px solid #000;border-radius:8px;background:#fff;
     font-weight:800;font-size:.85em;box-shadow:2px 2px 0 #000;cursor:pointer;touch-action:manipulation;min-height:44px;}
   .switch button.active{background:var(--dark);color:#fff;}
-  /* Member table (scrollable + sortable) */
   .lb-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:3px solid #000;border-radius:8px;background:#fff;margin-top:10px;}
   table.lb{width:100%;border-collapse:collapse;font-size:.78em;background:#fff;min-width:640px;}
   table.lb th,table.lb td{padding:7px 8px;text-align:left;border-bottom:2px solid #eee;white-space:nowrap;}
@@ -141,7 +140,7 @@
     <span class="brand-title">ACI CareerEDGE<br>Campus Leadership Programme</span>
   </div>
   <div class="user-info">
-    <a href="index.html">←</a>
+    <a href="/">←</a>
     <span id="syncDot" class="syncing" style="display:none;"></span>
     <span id="headerName"></span>
     <button class="btn btn-warn" style="padding:6px 10px;min-height:0;font-size:.78em;" onclick="logout()">Logout</button>
@@ -209,6 +208,7 @@
   <div class="game-hint">Tap arrows or swipe to play</div>
 </div>
 
+<script src="./users.js"></script>
 <script>
 /* ---------- SERVICE WORKER ---------- */
 if ('serviceWorker' in navigator && location.protocol === 'https:'){
@@ -423,7 +423,7 @@ function logout(){
   clearUserCache();
   localStorage.removeItem('aci_user');
   sessionStorage.clear();
-  location.href = 'index.html';
+  location.href = '/';
 }
 
 function digitsOnly(el){
@@ -448,14 +448,14 @@ function digitsOnly(el){
 /* ---------- BOOT ---------- */
 window.addEventListener('load', function(){
   var saved = sessionStorage.getItem('aci_team_user') || localStorage.getItem('aci_user');
-  if (!saved){ location.href = 'index.html'; return; }
+  if (!saved){ location.href = '/'; return; }
   try { user = JSON.parse(saved); }
-  catch (e){ location.href = 'index.html'; return; }
+  catch (e){ location.href = '/'; return; }
 
-  if (!user.teamNumber || user.teamNumber === 0){ location.href = 'index.html'; return; }
+  if (!user.teamNumber || user.teamNumber === 0){ location.href = '/'; return; }
 
   var t = Number(new URLSearchParams(location.search).get('t'));
-  if (t && t !== user.teamNumber){ location.replace('team.html?t=' + user.teamNumber); return; }
+  if (t && t !== user.teamNumber){ location.replace('/team?t=' + user.teamNumber); return; }
 
   $('headerName').textContent = user.name + ' (' + user.code + ')';
   $('teamTitle').textContent  = user.teamName;
@@ -474,7 +474,6 @@ window.addEventListener('load', function(){
   digitsOnly($('eMinutes'));
   digitsOnly($('ePromos'));
 
-  /* Restore view preference */
   var prefs = loadPrefs(user.code);
   if (prefs.view === 'summary'){
     var sumBtn = $('tabSummary');
@@ -755,7 +754,6 @@ document.addEventListener('click', function(e){
   }
 });
 
-/* Restore summary sort pref */
 (function restoreSummarySort(){
   var saved = sessionStorage.getItem('aci_team_user') || localStorage.getItem('aci_user');
   if (!saved) return;
