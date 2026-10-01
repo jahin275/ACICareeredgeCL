@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 <link rel="preload" as="image" href="./LOGO.png">
-<link rel="prefetch" href="./team.html">
-<link rel="prefetch" href="./admin.html">
+<link rel="prefetch" href="/team">
+<link rel="prefetch" href="/admin">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#1bddff;--ground:#2e7d32;--card:rgba(255,255,255,.94);--orange:#ff8c00;--text:#1a1a1a;--dark:#0d2b3e;}
@@ -131,7 +131,7 @@
   <div class="user-info" id="userInfo" style="display:none;">
     <span id="syncDot" class="syncing" style="display:none;"></span>
     <span id="headerName"></span>
-    <a id="adminLink" href="admin.html" style="display:none;color:#fff;background:#c62828;padding:4px 9px;border-radius:20px;font-weight:800;font-size:.75em;text-decoration:none;border:2px solid #000;box-shadow:2px 2px 0 #000;">⚙️</a>
+    <a id="adminLink" href="/admin" style="display:none;color:#fff;background:#c62828;padding:4px 9px;border-radius:20px;font-weight:800;font-size:.75em;text-decoration:none;border:2px solid #000;box-shadow:2px 2px 0 #000;">⚙️</a>
     <button class="btn btn-warn" style="padding:6px 10px;min-height:0;font-size:.78em;" onclick="logout()">Logout</button>
   </div>
 </header>
@@ -200,6 +200,7 @@
   <div class="game-hint">Tap arrows or swipe to play</div>
 </div>
 
+<script src="./users.js"></script>
 <script>
 /* ---------- SERVICE WORKER ---------- */
 if ('serviceWorker' in navigator && location.protocol === 'https:'){
@@ -509,7 +510,6 @@ function paintTeamTable(){
   box.innerHTML = p.join('');
 }
 
-/* Persist prefs whenever sorting/filtering/month changes */
 function persistIndexPrefs(){
   if (!user) return;
   savePrefs(user.code, {
@@ -539,13 +539,39 @@ document.addEventListener('click', function(e){
   var f2 = $('teamFilter'); if (f2) f2.addEventListener('input', function(){ paintTeamTable(); persistIndexPrefs(); });
 })();
 
-/* ---------- LOGIN ---------- */
+/* ---------- LOGIN (instant via users.js + backend confirmation) ---------- */
 function handleLogin(btn){
   var email = $('loginEmail').value.trim();
-  var code  = $('loginCode').value.trim();
+  var code  = $('loginCode').value.trim().toUpperCase();
   $('loginError').textContent = '';
   $('loginOk').textContent = '';
   if (!email || !code){ $('loginError').textContent = 'Email and Code required.'; return; }
+
+  /* ---- Instant local check via users.js ---- */
+  var localUser = null;
+  if (window.ACI_ROSTER && window.ACI_ROSTER.byEmail){
+    localUser = window.ACI_ROSTER.byEmail[email.toLowerCase() + '|' + code];
+  }
+  if (localUser){
+    user = localUser;
+    localStorage.setItem(LS_USER, JSON.stringify(user));
+    sessionStorage.setItem('aci_team_user', JSON.stringify(user));
+    $('loginOk').textContent = 'Welcome ' + user.name + '!';
+    enterApp();
+    /* Quietly confirm with backend; if rejected, fall out */
+    api('login', { email: email, code: code })
+      .then(function(r){
+        if (!r.success){
+          localStorage.removeItem(LS_USER);
+          sessionStorage.removeItem('aci_team_user');
+          location.reload();
+        }
+      })
+      .catch(function(){ /* offline — stay logged in locally */ });
+    return;
+  }
+
+  /* ---- Backend fallback (not found locally, or users.js missing) ---- */
   var orig = btn.textContent;
   btn.disabled = true; btn.textContent = 'Entering…';
   withSnake(function(){ return api('login', { email: email, code: code }); })
@@ -589,10 +615,9 @@ function enterApp(){
     dp.src = './' + user.teamNumber + '.png';
     dp.onerror = function(){ this.style.visibility = 'hidden'; };
   } else { dp.style.visibility = 'hidden'; }
-  $('goTeamBtn').href = 'team.html?t=' + user.teamNumber;
+  $('goTeamBtn').href = '/team?t=' + user.teamNumber;
   if (!user.teamNumber || user.teamNumber === 0) $('goTeamBtn').style.display = 'none';
 
-  /* Restore user preferences */
   var prefs = loadPrefs(user.code);
   if (prefs.indSort)  indSort  = prefs.indSort;
   if (prefs.teamSort) teamSort = prefs.teamSort;
@@ -605,12 +630,10 @@ function enterApp(){
 function applyBootstrap(r){
   if (r.months){
     monthsList = r.months;
-    /* Prefer saved month if still in range */
     var prefs = loadPrefs(user.code);
     if (prefs.month && monthsList.indexOf(prefs.month) !== -1) currentMonth = prefs.month;
     else currentMonth = r.currentMonth || monthsList[0];
     renderMonthTabs();
-    /* If we restored a non-default month, load that month's leaderboard */
     if (currentMonth !== (r.currentMonth || monthsList[0])){
       switchMonth(currentMonth);
     }
