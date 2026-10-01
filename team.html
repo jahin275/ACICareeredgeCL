@@ -90,8 +90,6 @@
     box-shadow:2px 2px 0 #000;}
   .sum-label{font-family:'Press Start 2P',monospace;font-size:.45em;color:#666;margin-bottom:6px;display:block;}
   .sum-value{font-family:'Press Start 2P',monospace;font-size:.9em;font-weight:900;color:var(--dark);}
-  .sum-box.highlight{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;}
-  .sum-box.highlight .sum-label,.sum-box.highlight .sum-value{color:#fff;}
   .switch{display:flex;gap:6px;margin-bottom:12px;}
   .switch button{flex:1;padding:10px;border:3px solid #000;border-radius:8px;background:#fff;
     font-weight:800;font-size:.85em;box-shadow:2px 2px 0 #000;cursor:pointer;touch-action:manipulation;min-height:44px;}
@@ -210,7 +208,6 @@
 
 <script src="./users.js"></script>
 <script>
-/* ---------- SERVICE WORKER ---------- */
 if ('serviceWorker' in navigator && location.protocol === 'https:'){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js').catch(function(){});
@@ -242,8 +239,18 @@ var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAo
 var $ = function(id){ return document.getElementById(id); };
 var user = null;
 
-/* ---------- LOCALSTORAGE CACHE ---------- */
-var CACHE_TTL = { entry: 60*60*1000, feed: 2*60*1000, sum: 3*60*1000 };
+function readSnapshot(){
+  try {
+    var raw = localStorage.getItem('aci_snapshot');
+    if (!raw) return null;
+    var obj = JSON.parse(raw);
+    if (obj.exp && obj.exp < Date.now()){ localStorage.removeItem('aci_snapshot'); return null; }
+    return obj.data;
+  } catch(e){ return null; }
+}
+function writeCache(key, data, ttlMs){
+  try { localStorage.setItem(key, JSON.stringify({ data: data, exp: Date.now() + (ttlMs || 60*60*1000) })); } catch(e){}
+}
 function readCache(key){
   try {
     var raw = localStorage.getItem(key);
@@ -253,22 +260,18 @@ function readCache(key){
     return obj.data;
   } catch(e){ return null; }
 }
-function writeCache(key, data, ttlMs){
-  try { localStorage.setItem(key, JSON.stringify({ data: data, exp: Date.now() + (ttlMs || CACHE_TTL.entry) })); } catch(e){}
-}
 function clearUserCache(){
   try {
     var keys = [];
     for (var i = 0; i < localStorage.length; i++){
       var k = localStorage.key(i);
-      if (k && k.indexOf('aci_') === 0 && k.indexOf('aci_prefs_') !== 0) keys.push(k);
+      if (k && k.indexOf('aci_') === 0 && k.indexOf('aci_prefs_') !== 0 && k !== 'aci_snapshot') keys.push(k);
     }
     keys.forEach(function(k){ localStorage.removeItem(k); });
   } catch(e){}
 }
 function showSync(on){ var d = $('syncDot'); if (d) d.style.display = on ? 'inline-block' : 'none'; }
 
-/* ---------- USER PREFS ---------- */
 function loadPrefs(code){
   try { return JSON.parse(localStorage.getItem('aci_prefs_' + code) || '{}'); }
   catch(e){ return {}; }
@@ -425,7 +428,6 @@ function logout(){
   sessionStorage.clear();
   location.href = '/';
 }
-
 function digitsOnly(el){
   el.addEventListener('input', function(){
     var v = this.value.replace(/[^0-9]/g, '');
@@ -451,9 +453,7 @@ window.addEventListener('load', function(){
   if (!saved){ location.href = '/'; return; }
   try { user = JSON.parse(saved); }
   catch (e){ location.href = '/'; return; }
-
   if (!user.teamNumber || user.teamNumber === 0){ location.href = '/'; return; }
-
   var t = Number(new URLSearchParams(location.search).get('t'));
   if (t && t !== user.teamNumber){ location.replace('/team?t=' + user.teamNumber); return; }
 
@@ -480,9 +480,11 @@ window.addEventListener('load', function(){
     if (sumBtn) switchView('summary', sumBtn);
   }
 
+  /* Paint from snapshot if available */
+  var snap = readSnapshot();
+  if (snap) applySnapshotTeam(snap);
+
   loadMyEntry();
-  loadTeamPosts();
-  loadTeamSummary();
 }, {once:true});
 
 function switchView(name, btn){
@@ -496,8 +498,23 @@ function switchView(name, btn){
     p.view = name;
     savePrefs(user.code, p);
   }
-  if (name === 'summary') loadTeamSummary();
 }
+
+function applySnapshotTeam(snap){
+  if (!snap || !user || !user.teamNumber) return;
+  var t = snap.teams && snap.teams[user.teamNumber];
+  if (t && t.totals){
+    var tt = t.totals;
+    $('tsMin').textContent   = tt.minutes;
+    $('tsPromo').textContent = tt.promos;
+    $('tsApps').textContent  = tt.apps;
+    $('tsRegs').textContent  = tt.regs;
+    renderSummary(t);
+  }
+  var feed = snap.teamFeeds && snap.teamFeeds[user.teamNumber];
+  if (feed) renderFeed(feed);
+}
+window.applySnapshotTeam = applySnapshotTeam;
 
 function loadMyEntry(){
   var date = $('eDate').value;
@@ -529,7 +546,7 @@ function loadMyEntry(){
   withSnake(function(){ return api('getMyEntry', {code: user.code, date: date}); }, silent)
     .then(function(r){
       var e = r.entry || null;
-      writeCache(cacheKey, {entry: e}, CACHE_TTL.entry);
+      writeCache(cacheKey, {entry: e}, 60*60*1000);
       apply(e);
     })
     .catch(function(){})
@@ -561,45 +578,14 @@ function submitEntry(btn){
       }
       $('formMsg').textContent = r.updated ? '✅ Entry updated!' : '✅ Entry saved!';
       $('formMsg').className = 'ok';
-      try {
-        localStorage.removeItem('aci_entry_' + user.code + '_' + date);
-        localStorage.removeItem('aci_boot_' + user.code);
-        localStorage.removeItem('aci_feed_' + user.teamNumber);
-        localStorage.removeItem('aci_sum_' + user.teamNumber);
-        var keysToNuke = [];
-        for (var i = 0; i < localStorage.length; i++){
-          var k = localStorage.key(i);
-          if (k && k.indexOf('aci_lb_' + user.code + '_') === 0) keysToNuke.push(k);
-        }
-        keysToNuke.forEach(function(k){ localStorage.removeItem(k); });
-      } catch(e){}
-      return Promise.all([loadMyEntry(), loadTeamPosts(true), loadTeamSummary(true)]);
+      try { localStorage.removeItem('aci_entry_' + user.code + '_' + date); } catch(e){}
+      loadMyEntry();
     })
     .catch(function(e){
       $('formMsg').textContent = e.message || 'Failed. Try again.';
       $('formMsg').className = 'err';
     })
     .finally(function(){ btn.disabled = false; btn.textContent = o; });
-}
-
-function loadTeamPosts(force){
-  var cacheKey = 'aci_feed_' + user.teamNumber;
-  var cached = readCache(cacheKey);
-  if (cached && !force){
-    renderFeed(cached);
-  } else if (!cached){
-    $('feedBox').innerHTML = '<p class="empty">Loading…</p>';
-  }
-  var silent = !!cached && !force;
-  if (silent) showSync(true);
-  withSnake(function(){ return api('getTeamPosts', {teamNumber: user.teamNumber}); }, silent)
-    .then(function(r){
-      var posts = r.posts || [];
-      writeCache(cacheKey, posts, CACHE_TTL.feed);
-      renderFeed(posts);
-    })
-    .catch(function(){ if (!cached) $('feedBox').innerHTML = '<p class="err">Failed to load feed.</p>'; })
-    .finally(function(){ showSync(false); });
 }
 
 function renderFeed(posts){
@@ -634,7 +620,7 @@ function renderFeed(posts){
   $('feedBox').innerHTML = p.join('');
 }
 
-/* ---------- TEAM SUMMARY (member breakdown + overall rank + sorting) ---------- */
+/* ---------- TEAM SUMMARY ---------- */
 var summarySort = {key: 'month', dir: -1};
 var summaryBadge = function(r){ return r <= 3 ? 'gold silver bronze'.split(' ')[r-1] : ''; };
 function summaryArrow(s, k){
@@ -652,29 +638,8 @@ var SUMMARY_COLS = [
   {k:'total',       l:'All'}
 ];
 
-function loadTeamSummary(force){
-  var cacheKey = 'aci_sum_' + user.teamNumber;
-  var cached = readCache(cacheKey);
-  if (cached && !force){
-    renderSummary(cached);
-  } else if (!cached){
-    $('membersBox').innerHTML = '<p class="empty">Loading…</p>';
-  }
-  var silent = !!cached && !force;
-  if (silent) showSync(true);
-  withSnake(function(){ return api('getTeamSummary', {teamNumber: user.teamNumber}); }, silent)
-    .then(function(r){
-      if (!r.success) return;
-      writeCache(cacheKey, r, CACHE_TTL.sum);
-      renderSummary(r);
-    })
-    .catch(function(){ if (!cached) $('membersBox').innerHTML = '<p class="err">Failed to load summary.</p>'; })
-    .finally(function(){ showSync(false); });
-}
-
 function renderSummary(r){
   window.__lastSummary = r;
-
   var t = r.totals;
   $('tsMin').textContent   = t.minutes;
   $('tsPromo').textContent = t.promos;
@@ -705,10 +670,9 @@ function renderSummary(r){
   p.push('<th>Name</th>');
   for (var c = 0; c < SUMMARY_COLS.length; c++){
     var col = SUMMARY_COLS[c];
-    var title = col.k === 'overallRank'
-      ? 'Overall individual rank this month'
-      : (col.k === 'present' ? 'Days Present / Absent'
-      : (col.k === 'month' ? 'Points this month' : (col.k === 'total' ? 'Points all time' : col.l)));
+    var title = col.k === 'overallRank' ? 'Overall individual rank this month'
+              : (col.k === 'present' ? 'Days Present / Absent'
+              : (col.k === 'month' ? 'Points this month' : (col.k === 'total' ? 'Points all time' : col.l)));
     p.push('<th class="sortable' + (s.key === col.k ? ' active-sort' : '') +
            '" data-k="' + col.k + '" title="' + title + '">' +
            col.l + summaryArrow(s, col.k) + '</th>');
@@ -764,5 +728,6 @@ document.addEventListener('click', function(e){
   } catch(e){}
 })();
 </script>
-</body>
-</html>
+
+<!-- FIREBASE REALTIME SUBSCRIBER -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
