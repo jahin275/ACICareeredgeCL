@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 <link rel="preload" as="image" href="./LOGO.png">
+<link rel="prefetch" href="./index.html">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#1bddff;--ground:#2e7d32;--card:rgba(255,255,255,.94);--orange:#ff8c00;--text:#1a1a1a;--dark:#0d2b3e;}
@@ -182,8 +183,8 @@
 
   <div class="card">
     <div class="switch">
-      <button class="active" onclick="switchView('feed', this)">👥 Team Feed</button>
-      <button onclick="switchView('summary', this)">📊 Team Summary</button>
+      <button id="tabFeed" class="active" onclick="switchView('feed', this)">👥 Team Feed</button>
+      <button id="tabSummary" onclick="switchView('summary', this)">📊 Team Summary</button>
     </div>
     <div id="view-feed">
       <p style="font-size:.82em;color:#555;margin-bottom:10px;">Today &amp; yesterday — only your team can see this.</p>
@@ -209,6 +210,13 @@
 </div>
 
 <script>
+/* ---------- SERVICE WORKER ---------- */
+if ('serviceWorker' in navigator && location.protocol === 'https:'){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+
 (function lockDown(){
   document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, {capture:true});
   document.addEventListener('keydown', function(e){
@@ -234,7 +242,7 @@ var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAo
 var $ = function(id){ return document.getElementById(id); };
 var user = null;
 
-/* ---------- CLIENT CACHE ---------- */
+/* ---------- LOCALSTORAGE CACHE ---------- */
 var CACHE_TTL = { entry: 60*60*1000, feed: 2*60*1000, sum: 3*60*1000 };
 function readCache(key){
   try {
@@ -253,12 +261,21 @@ function clearUserCache(){
     var keys = [];
     for (var i = 0; i < localStorage.length; i++){
       var k = localStorage.key(i);
-      if (k && k.indexOf('aci_') === 0) keys.push(k);
+      if (k && k.indexOf('aci_') === 0 && k.indexOf('aci_prefs_') !== 0) keys.push(k);
     }
     keys.forEach(function(k){ localStorage.removeItem(k); });
   } catch(e){}
 }
 function showSync(on){ var d = $('syncDot'); if (d) d.style.display = on ? 'inline-block' : 'none'; }
+
+/* ---------- USER PREFS ---------- */
+function loadPrefs(code){
+  try { return JSON.parse(localStorage.getItem('aci_prefs_' + code) || '{}'); }
+  catch(e){ return {}; }
+}
+function savePrefs(code, obj){
+  try { localStorage.setItem('aci_prefs_' + code, JSON.stringify(obj)); } catch(e){}
+}
 
 /* ---------- SNAKE ---------- */
 var snakeGameId = 0;
@@ -457,6 +474,13 @@ window.addEventListener('load', function(){
   digitsOnly($('eMinutes'));
   digitsOnly($('ePromos'));
 
+  /* Restore view preference */
+  var prefs = loadPrefs(user.code);
+  if (prefs.view === 'summary'){
+    var sumBtn = $('tabSummary');
+    if (sumBtn) switchView('summary', sumBtn);
+  }
+
   loadMyEntry();
   loadTeamPosts();
   loadTeamSummary();
@@ -468,6 +492,11 @@ function switchView(name, btn){
   btn.classList.add('active');
   $('view-feed').style.display = (name === 'feed') ? 'block' : 'none';
   $('view-summary').style.display = (name === 'summary') ? 'block' : 'none';
+  if (user){
+    var p = loadPrefs(user.code);
+    p.view = name;
+    savePrefs(user.code, p);
+  }
   if (name === 'summary') loadTeamSummary();
 }
 
@@ -606,7 +635,7 @@ function renderFeed(posts){
   $('feedBox').innerHTML = p.join('');
 }
 
-/* ---------- TEAM SUMMARY (with member breakdown + overall rank + sorting) ---------- */
+/* ---------- TEAM SUMMARY (member breakdown + overall rank + sorting) ---------- */
 var summarySort = {key: 'month', dir: -1};
 var summaryBadge = function(r){ return r <= 3 ? 'gold silver bronze'.split(' ')[r-1] : ''; };
 function summaryArrow(s, k){
@@ -627,8 +656,11 @@ var SUMMARY_COLS = [
 function loadTeamSummary(force){
   var cacheKey = 'aci_sum_' + user.teamNumber;
   var cached = readCache(cacheKey);
-  if (cached && !force) renderSummary(cached);
-  else if (!cached) $('membersBox').innerHTML = '<p class="empty">Loading…</p>';
+  if (cached && !force){
+    renderSummary(cached);
+  } else if (!cached){
+    $('membersBox').innerHTML = '<p class="empty">Loading…</p>';
+  }
   var silent = !!cached && !force;
   if (silent) showSync(true);
   withSnake(function(){ return api('getTeamSummary', {teamNumber: user.teamNumber}); }, silent)
@@ -712,11 +744,27 @@ document.addEventListener('click', function(e){
       if (summarySort.key === k) summarySort.dir = -summarySort.dir;
       else { summarySort.key = k; summarySort.dir = -1; }
       if (window.__lastSummary) renderSummary(window.__lastSummary);
+      if (user){
+        var p = loadPrefs(user.code);
+        p.summarySort = summarySort;
+        savePrefs(user.code, p);
+      }
       return;
     }
     el = el.parentNode;
   }
 });
+
+/* Restore summary sort pref */
+(function restoreSummarySort(){
+  var saved = sessionStorage.getItem('aci_team_user') || localStorage.getItem('aci_user');
+  if (!saved) return;
+  try {
+    var u = JSON.parse(saved);
+    var p = loadPrefs(u.code);
+    if (p.summarySort) summarySort = p.summarySort;
+  } catch(e){}
+})();
 </script>
 </body>
 </html>
