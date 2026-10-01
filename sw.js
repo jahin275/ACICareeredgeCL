@@ -1,14 +1,14 @@
-/* ACI Careeredge — Service Worker
- * Cache-first for the app shell (HTML/CSS/JS/images/fonts).
- * Network-only for Apps Script API.
- * Bump CACHE version whenever you deploy new HTML files.
+/* ACI CareerEDGE — Service Worker
+ * Cache-first app shell. Handles extensionless URLs (/team → /team.html).
+ * Bump CACHE whenever you deploy new HTML/JS files.
  */
-const CACHE = 'aci-shell-v3';
+const CACHE = 'aci-shell-v4';
 const PRECACHE = [
   './',
   './index.html',
   './team.html',
   './admin.html',
+  './users.js',
   './favicon.png',
   './LOGO.png',
   './1.png','./2.png','./3.png','./4.png',
@@ -41,15 +41,20 @@ self.addEventListener('fetch', function(e){
   var url;
   try { url = new URL(req.url); } catch (err){ return; }
 
-  /* Never cache the Apps Script API — always live */
+  /* Never cache the Apps Script API */
   if (url.hostname.indexOf('script.google.com') >= 0) return;
   /* Cross-origin: only allow Google Fonts */
   if (url.origin !== location.origin && url.hostname.indexOf('fonts.') === -1) return;
 
+  var path = url.pathname;
+
+  /* Extensionless navigation (/team, /admin, /index) → map to .html */
+  var isExtensionless = path !== '/' && !/\.[a-z0-9]+$/i.test(path);
+
   e.respondWith(
     caches.match(req).then(function(cached){
       if (cached){
-        /* Serve from disk, refresh silently in the background */
+        /* Serve cached + refresh in background */
         fetch(req).then(function(res){
           if (res && res.ok){
             caches.open(CACHE).then(function(c){ c.put(req, res.clone()); });
@@ -57,16 +62,35 @@ self.addEventListener('fetch', function(e){
         }).catch(function(){});
         return cached;
       }
-      return fetch(req).then(function(res){
-        if (res && res.ok){
-          var clone = res.clone();
-          caches.open(CACHE).then(function(c){ c.put(req, clone); });
-        }
-        return res;
-      }).catch(function(){
-        /* If offline and it's a page navigation, fall back to index.html */
-        if (req.mode === 'navigate') return caches.match('./index.html');
-      });
+
+      /* Try .html fallback for extensionless paths */
+      if (isExtensionless){
+        return caches.match(path + '.html').then(function(hc){
+          if (hc){
+            fetch(req).then(function(res){
+              if (res && res.ok){
+                caches.open(CACHE).then(function(c){ c.put(req, res.clone()); });
+              }
+            }).catch(function(){});
+            return hc;
+          }
+          return networkOrFallback(req);
+        });
+      }
+
+      return networkOrFallback(req);
     })
   );
 });
+
+function networkOrFallback(req){
+  return fetch(req).then(function(res){
+    if (res && res.ok){
+      var clone = res.clone();
+      caches.open(CACHE).then(function(c){ c.put(req, clone); });
+    }
+    return res;
+  }).catch(function(){
+    if (req.mode === 'navigate') return caches.match('./index.html');
+  });
+}
