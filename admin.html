@@ -72,6 +72,9 @@
   tr.me{background:#fff3cd;}
   tr:last-child td{border-bottom:none;}
   tr:hover td{background:#f0f8ff;}
+  th.sortable{cursor:pointer;-webkit-user-select:none;user-select:none;}
+  th.sortable .ar{opacity:.8;font-size:.85em;margin-left:3px;}
+  th.active-sort{background:var(--orange);}
   .rank-badge{display:inline-block;min-width:24px;padding:2px 6px;border-radius:6px;background:var(--orange);color:#fff;
     font-weight:900;text-align:center;font-size:.78em;}
   .rank-badge.gold{background:#f9a825;} .rank-badge.silver{background:#9e9e9e;} .rank-badge.bronze{background:#a1887f;}
@@ -154,23 +157,20 @@
 
     <div id="tab-overview" class="tab-content">
       <div class="card">
-        <h3>🛡️ Team Breakdown</h3>
+        <h3>🛡️ Team Breakdown <span style="font-size:.7em;font-weight:400;color:#666;">(click column headers to sort)</span></h3>
         <div class="table-wrap">
           <table>
-            <thead><tr>
-              <th>#</th><th>Team</th><th>Mem</th><th>Ent</th>
-              <th>Today</th><th>Week</th><th>Month</th><th>All</th>
-            </tr></thead>
-            <tbody id="teamsBody"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
+            <thead><tr id="teamsHead"></tr></thead>
+            <tbody id="teamsBody"><tr><td colspan="9" class="empty">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
       <div class="card">
-        <h3>🏆 Top 10 This Month</h3>
+        <h3>🏆 Top 10 This Month <span style="font-size:.7em;font-weight:400;color:#666;">(click column headers to sort)</span></h3>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>#</th><th>Name</th><th>Team</th><th>Month</th></tr></thead>
-            <tbody id="topBody"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody>
+            <thead><tr id="topHead"></tr></thead>
+            <tbody id="topBody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -178,7 +178,7 @@
 
     <div id="tab-entries" class="tab-content" style="display:none;">
       <div class="card">
-        <h3>📋 All Entries</h3>
+        <h3>📋 All Entries <span style="font-size:.7em;font-weight:400;color:#666;">(click column headers to sort)</span></h3>
         <div class="filters">
           <div><label>Team</label>
             <select id="fTeam"><option value="">All</option></select></div>
@@ -192,10 +192,7 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr>
-              <th>Date</th><th>User</th><th>Team</th><th>Att</th>
-              <th>Min</th><th>Promo</th><th>App</th><th>Reg</th><th>Pts</th>
-            </tr></thead>
+            <thead><tr id="entriesHead"></tr></thead>
             <tbody id="entriesBody"><tr><td colspan="9" class="empty">Loading…</td></tr></tbody>
           </table>
         </div>
@@ -204,16 +201,12 @@
 
     <div id="tab-users" class="tab-content" style="display:none;">
       <div class="card">
-        <h3>👥 All Users</h3>
+        <h3>👥 All Users <span style="font-size:.7em;font-weight:400;color:#666;">(click column headers to sort)</span></h3>
         <input type="text" id="uSearch" placeholder="Search by name or code…" oninput="renderUsers()"
                autocapitalize="off" spellcheck="false">
         <div class="table-wrap">
           <table>
-            <thead><tr>
-              <th>#</th><th>Name</th><th>Team</th>
-              <th>Today</th><th>Week</th><th>Month</th><th>All</th>
-              <th>Ent</th><th>Att (P/A)</th>
-            </tr></thead>
+            <thead><tr id="usersHead"></tr></thead>
             <tbody id="usersBody"><tr><td colspan="9" class="empty">Loading…</td></tr></tbody>
           </table>
         </div>
@@ -245,14 +238,12 @@
   </div>
 </div>
 
-<script src="./users.js"></script>
 <script>
 if ('serviceWorker' in navigator && location.protocol === 'https:'){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js').catch(function(){});
   });
 }
-
 (function lockDown(){
   document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, {capture:true});
   document.addEventListener('dragstart', function(e){ e.preventDefault(); }, {capture:true});
@@ -268,18 +259,23 @@ if (!isMobile){
 }
 
 var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
+var API_SECRET = '2904a8fe-af0d-42c6-8410-fd087b21ac33-862d8420-4d5a-4013-b0f5-e6cd03fd4e97';
 var $ = function(id){ return document.getElementById(id); };
 var user = null;
 var adminData = null;
 
-function readSnapshot(){
+/* ---------- CACHE ---------- */
+function readCache(key){
   try {
-    var raw = localStorage.getItem('aci_snapshot');
+    var raw = localStorage.getItem(key);
     if (!raw) return null;
     var obj = JSON.parse(raw);
-    if (obj.exp && obj.exp < Date.now()){ localStorage.removeItem('aci_snapshot'); return null; }
+    if (obj.exp && obj.exp < Date.now()){ localStorage.removeItem(key); return null; }
     return obj.data;
   } catch(e){ return null; }
+}
+function writeCache(key, data, ttlMs){
+  try { localStorage.setItem(key, JSON.stringify({ data: data, exp: Date.now() + (ttlMs || 2*60*1000) })); } catch(e){}
 }
 function showSync(on){ var d = $('syncDot'); if (d) d.style.display = on ? 'inline-block' : 'none'; }
 
@@ -293,6 +289,7 @@ function savePrefs(code, obj){
 
 function api(action, payload){
   payload = payload || {};
+  payload.secret = API_SECRET;
   var body = JSON.stringify(Object.assign({action: action}, payload));
   return fetch(API_URL, {
     method: 'POST',
@@ -324,6 +321,47 @@ function logout(){
   location.href = '/';
 }
 
+/* ---------- SORT STATE ---------- */
+var sortState = {
+  teams:   {key:'month', dir:-1},
+  top:     {key:'month', dir:-1},
+  entries: {key:'date',  dir:-1},
+  users:   {key:'month', dir:-1}
+};
+function arrowFor(state, k){
+  if (state.key !== k) return '<span class="ar">↕</span>';
+  return '<span class="ar">' + (state.dir < 0 ? '▼' : '▲') + '</span>';
+}
+function th(table, key, label, title){
+  var s = sortState[table];
+  return '<th class="sortable' + (s.key === key ? ' active-sort' : '') +
+         '" data-table="' + table + '" data-key="' + key + '"' +
+         (title ? ' title="' + title + '"' : '') + '>' +
+         label + arrowFor(s, key) + '</th>';
+}
+
+/* One global click handler for all admin tables */
+document.addEventListener('click', function(e){
+  var el = e.target;
+  while (el && el !== document){
+    if (el.tagName === 'TH' && el.classList && el.classList.contains('sortable')){
+      var table = el.getAttribute('data-table');
+      var key   = el.getAttribute('data-key');
+      var s = sortState[table];
+      if (!s) return;
+      if (s.key === key) s.dir = -s.dir;
+      else { s.key = key; s.dir = -1; }
+      if (table === 'teams')        renderTeams();
+      else if (table === 'top')     renderTop();
+      else if (table === 'entries') renderEntries();
+      else if (table === 'users')   renderUsers();
+      return;
+    }
+    el = el.parentNode;
+  }
+});
+
+/* ---------- BOOT ---------- */
 window.addEventListener('load', function(){
   var saved = localStorage.getItem('aci_user');
   if (!saved){ location.href = '/'; return; }
@@ -341,8 +379,7 @@ window.addEventListener('load', function(){
     if (target) switchTab(prefs.adminTab, target);
   }
 
-  /* Paint from snapshot if available */
-  var snap = readSnapshot();
+  var snap = readCache('aci_snapshot');
   if (snap) applySnapshotAdmin(snap);
 }, {once:true});
 
@@ -369,7 +406,6 @@ function applySnapshotAdmin(snap){
       minutes: u.minutes || 0, promos: u.promos || 0, apps: u.apps || 0, regs: u.regs || 0
     });
   }
-  users.sort(function(a,b){ return b.month - a.month || b.total - a.total; });
 
   var teams = [];
   for (var t = 1; t <= 8; t++){
@@ -397,20 +433,47 @@ function applySnapshotAdmin(snap){
   $('sMonth').textContent    = Math.round(totalMonth * 100) / 100;
   $('sAll').textContent      = Math.round(totalAll * 100) / 100;
 
-  paintTeams(teams);
-  paintTop(users);
-  paintEntries(entries);
-  paintUsers();
+  paintTeamsHeader();
+  paintTopHeader();
+  paintEntriesHeader();
+  paintUsersHeader();
+
+  renderTeams();
+  renderTop();
+  renderEntries();
+  renderUsers();
   paintAnnouncements(snap.global ? snap.global.announcements : []);
   paintPosts(snap.global ? snap.global.posts : []);
   populateTeamFilter(teams);
 }
 window.applySnapshotAdmin = applySnapshotAdmin;
 
-function paintTeams(teams){
+/* ---------- TEAMS TABLE ---------- */
+function paintTeamsHeader(){
+  $('teamsHead').innerHTML =
+    th('teams','teamNumber','#','Team number') +
+    th('teams','teamName','Team','Team name') +
+    th('teams','members','Mem','Member count') +
+    th('teams','entries','Ent','Entry count') +
+    th('teams','day','Today') +
+    th('teams','week','Week') +
+    th('teams','month','Month') +
+    th('teams','total','All');
+}
+function renderTeams(){
+  var teams = (adminData && adminData.teams) || [];
+  var s = sortState.teams;
+  var sorted = teams.slice().sort(function(a, b){
+    var av = a[s.key], bv = b[s.key];
+    if (typeof av === 'string' || typeof bv === 'string'){
+      return String(av||'').localeCompare(String(bv||'')) * s.dir;
+    }
+    av = Number(av) || 0; bv = Number(bv) || 0;
+    return (av - bv) * s.dir;
+  });
   var p = [];
-  for (var i = 0; i < teams.length; i++){
-    var t = teams[i];
+  for (var i = 0; i < sorted.length; i++){
+    var t = sorted[i];
     p.push('<tr' + (t.teamNumber === user.teamNumber ? ' class="me"' : '') + '>' +
       '<td>' + t.teamNumber + '</td>' +
       '<td><strong>' + esc(t.teamName) + '</strong></td>' +
@@ -424,21 +487,56 @@ function paintTeams(teams){
   }
   $('teamsBody').innerHTML = p.join('') || '<tr><td colspan="8" class="empty">No teams.</td></tr>';
 }
-function paintTop(users){
-  var sorted = users.slice(0).sort(function(a, b){ return b.month - a.month; }).slice(0, 10);
+
+/* ---------- TOP 10 TABLE ---------- */
+function paintTopHeader(){
+  $('topHead').innerHTML =
+    th('top','rank','#','Position') +
+    th('top','name','Name') +
+    th('top','teamName','Team') +
+    th('top','minutes','Min','Working minutes') +
+    th('top','apps','App','Successful applications') +
+    th('top','month','Month','Points this month');
+}
+function renderTop(){
+  var users = (adminData && adminData.users) || [];
+  var s = sortState.top;
+  var sorted = users.slice().sort(function(a, b){
+    var av = a[s.key], bv = b[s.key];
+    if (typeof av === 'string' || typeof bv === 'string'){
+      return String(av||'').localeCompare(String(bv||'')) * s.dir;
+    }
+    av = Number(av) || 0; bv = Number(bv) || 0;
+    return (av - bv) * s.dir;
+  }).slice(0, 10);
   var p = [];
   for (var i = 0; i < sorted.length; i++){
     var u = sorted[i];
     p.push('<tr><td><span class="rank-badge ' + badge(i+1) + '">' + (i+1) + '</span></td>' +
       '<td>' + esc(u.name) + '</td>' +
       '<td>' + esc(u.teamName) + '</td>' +
+      '<td>' + (u.minutes || 0) + '</td>' +
+      '<td>' + (u.apps || 0) + '</td>' +
       '<td><strong>' + u.month + '</strong></td></tr>');
   }
-  $('topBody').innerHTML = p.join('') || '<tr><td colspan="4" class="empty">No scores.</td></tr>';
+  $('topBody').innerHTML = p.join('') || '<tr><td colspan="6" class="empty">No scores.</td></tr>';
 }
-function paintEntries(entries){ window.__allEntries = entries || []; renderEntries(); }
+
+/* ---------- ENTRIES TABLE ---------- */
+function paintEntriesHeader(){
+  $('entriesHead').innerHTML =
+    th('entries','date','Date') +
+    th('entries','name','User') +
+    th('entries','teamName','Team') +
+    th('entries','attendance','Att') +
+    th('entries','minutes','Min','Working minutes') +
+    th('entries','promos','Promo','Promotional posts') +
+    th('entries','apps','App','Successful applications') +
+    th('entries','regs','Reg','Successful registrations') +
+    th('entries','points','Pts','Total points');
+}
 function renderEntries(){
-  var all = window.__allEntries || [];
+  var all = (adminData && adminData.entries) || [];
   var teamFilter = $('fTeam').value, from = $('fFrom').value, to = $('fTo').value;
   var q = $('fSearch').value.trim().toLowerCase();
   var filtered = all.filter(function(e){
@@ -456,9 +554,18 @@ function renderEntries(){
     $('entriesBody').innerHTML = '<tr><td colspan="9" class="empty">No entries match.</td></tr>';
     return;
   }
+  var s = sortState.entries;
+  var sorted = filtered.slice().sort(function(a, b){
+    var av = a[s.key], bv = b[s.key];
+    if (typeof av === 'string' || typeof bv === 'string'){
+      return String(av||'').localeCompare(String(bv||'')) * s.dir;
+    }
+    av = Number(av) || 0; bv = Number(bv) || 0;
+    return (av - bv) * s.dir;
+  });
   var p = [];
-  for (var i = 0; i < filtered.length; i++){
-    var e = filtered[i];
+  for (var i = 0; i < sorted.length; i++){
+    var e = sorted[i];
     var attCls = e.attendance === 'Absent' ? 'absent' : 'present';
     var mine = e.code === user.code ? ' class="me"' : '';
     p.push('<tr' + mine + '>' +
@@ -494,7 +601,21 @@ function populateTeamFilter(teams){
   }
   sel.innerHTML = opts;
 }
-function paintUsers(){
+
+/* ---------- USERS TABLE ---------- */
+function paintUsersHeader(){
+  $('usersHead').innerHTML =
+    th('users','rank','#','Position') +
+    th('users','name','Name') +
+    th('users','teamName','Team') +
+    th('users','day','Today') +
+    th('users','week','Week') +
+    th('users','month','Month') +
+    th('users','total','All') +
+    th('users','entries','Ent','Entry count') +
+    th('users','present','Att (P/A)','Present / absent');
+}
+function renderUsers(){
   var users = (adminData && adminData.users) || [];
   var q = $('uSearch').value.trim().toLowerCase();
   var filtered = users.filter(function(u){
@@ -505,9 +626,18 @@ function paintUsers(){
     $('usersBody').innerHTML = '<tr><td colspan="9" class="empty">No users match.</td></tr>';
     return;
   }
+  var s = sortState.users;
+  var sorted = filtered.slice().sort(function(a, b){
+    var av = a[s.key], bv = b[s.key];
+    if (typeof av === 'string' || typeof bv === 'string'){
+      return String(av||'').localeCompare(String(bv||'')) * s.dir;
+    }
+    av = Number(av) || 0; bv = Number(bv) || 0;
+    return (av - bv) * s.dir;
+  });
   var p = [];
-  for (var i = 0; i < filtered.length; i++){
-    var u = filtered[i];
+  for (var i = 0; i < sorted.length; i++){
+    var u = sorted[i];
     p.push('<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + esc(u.name) + '<div style="font-size:.72em;color:#666;">' + esc(u.code) + '</div></td>' +
@@ -522,6 +652,8 @@ function paintUsers(){
   }
   $('usersBody').innerHTML = p.join('');
 }
+
+/* ---------- GLOBAL ---------- */
 function paintAnnouncements(list){
   if (!list || !list.length){ $('annList').innerHTML = '<p class="empty">No announcements yet.</p>'; return; }
   var p = [];
@@ -566,7 +698,6 @@ function postAnnouncement(btn){
       $('annStatus').textContent = '✅ Published!';
       $('annStatus').className = 'ok';
       $('annMsg').value = '';
-      /* Firebase will push the updated snapshot within ~1 s */
     })
     .catch(function(e){
       $('annStatus').textContent = e.message || 'Failed.';
@@ -589,7 +720,6 @@ function switchTab(name, btn){
 }
 </script>
 
-<!-- FIREBASE REALTIME SUBSCRIBER -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
