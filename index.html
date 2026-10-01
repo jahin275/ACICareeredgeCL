@@ -238,26 +238,25 @@ var user = null;
 var currentMonth = '';
 var monthsList = [];
 
-/* ---------- LOCALSTORAGE CACHE ---------- */
-var CACHE_TTL = { boot: 30*60*1000, lb: 5*60*1000, lbOld: 60*60*1000 };
-function readCache(key){
+/* ---------- SNAPSHOT CACHE ---------- */
+function readSnapshot(){
   try {
-    var raw = localStorage.getItem(key);
+    var raw = localStorage.getItem('aci_snapshot');
     if (!raw) return null;
     var obj = JSON.parse(raw);
-    if (obj.exp && obj.exp < Date.now()){ localStorage.removeItem(key); return null; }
+    if (obj.exp && obj.exp < Date.now()){ localStorage.removeItem('aci_snapshot'); return null; }
     return obj.data;
   } catch(e){ return null; }
 }
-function writeCache(key, data, ttlMs){
-  try { localStorage.setItem(key, JSON.stringify({ data: data, exp: Date.now() + (ttlMs || CACHE_TTL.boot) })); } catch(e){}
+function writeSnapshot(data){
+  try { localStorage.setItem('aci_snapshot', JSON.stringify({ data: data, exp: Date.now() + 30*60*1000 })); } catch(e){}
 }
 function clearUserCache(){
   try {
     var keys = [];
     for (var i = 0; i < localStorage.length; i++){
       var k = localStorage.key(i);
-      if (k && k.indexOf('aci_') === 0 && k.indexOf('aci_prefs_') !== 0) keys.push(k);
+      if (k && k.indexOf('aci_') === 0 && k.indexOf('aci_prefs_') !== 0 && k !== 'aci_snapshot') keys.push(k);
     }
     keys.forEach(function(k){ localStorage.removeItem(k); });
   } catch(e){}
@@ -275,11 +274,7 @@ function savePrefs(code, obj){
 
 /* ---------- SNAKE ---------- */
 var snakeGameId = 0;
-function showSnake(){
-  snakeGameId++; var id = snakeGameId;
-  $('snakeOverlay').classList.add('show');
-  startSnake(id);
-}
+function showSnake(){ snakeGameId++; var id = snakeGameId; $('snakeOverlay').classList.add('show'); startSnake(id); }
 function hideSnake(){ snakeGameId++; $('snakeOverlay').classList.remove('show'); }
 function startSnake(myId){
   var oldCanvas = $('snakeCanvas');
@@ -539,7 +534,28 @@ document.addEventListener('click', function(e){
   var f2 = $('teamFilter'); if (f2) f2.addEventListener('input', function(){ paintTeamTable(); persistIndexPrefs(); });
 })();
 
-/* ---------- LOGIN (instant via users.js + backend confirmation) ---------- */
+/* ---------- SNAPSHOT APPLIER ---------- */
+function applySnapshot(snap){
+  if (!snap) return;
+  if (snap.months){
+    monthsList = snap.months;
+    var prefs = loadPrefs(user ? user.code : 'anon');
+    if (prefs.month && monthsList.indexOf(prefs.month) !== -1) currentMonth = prefs.month;
+    else currentMonth = snap.currentMonth || monthsList[0];
+    renderMonthTabs();
+  }
+  if (snap.leaderboards && snap.leaderboards[currentMonth]){
+    var lb = snap.leaderboards[currentMonth];
+    indData  = lb.individual || [];
+    teamData = lb.team || [];
+    paintIndTable();
+    paintTeamTable();
+  }
+  if (snap.global) renderGlobal(snap.global);
+}
+window.applySnapshot = applySnapshot;
+
+/* ---------- LOGIN ---------- */
 function handleLogin(btn){
   var email = $('loginEmail').value.trim();
   var code  = $('loginCode').value.trim().toUpperCase();
@@ -547,7 +563,6 @@ function handleLogin(btn){
   $('loginOk').textContent = '';
   if (!email || !code){ $('loginError').textContent = 'Email and Code required.'; return; }
 
-  /* ---- Instant local check via users.js ---- */
   var localUser = null;
   if (window.ACI_ROSTER && window.ACI_ROSTER.byEmail){
     localUser = window.ACI_ROSTER.byEmail[email.toLowerCase() + '|' + code];
@@ -558,7 +573,6 @@ function handleLogin(btn){
     sessionStorage.setItem('aci_team_user', JSON.stringify(user));
     $('loginOk').textContent = 'Welcome ' + user.name + '!';
     enterApp();
-    /* Quietly confirm with backend; if rejected, fall out */
     api('login', { email: email, code: code })
       .then(function(r){
         if (!r.success){
@@ -567,11 +581,10 @@ function handleLogin(btn){
           location.reload();
         }
       })
-      .catch(function(){ /* offline — stay logged in locally */ });
+      .catch(function(){});
     return;
   }
 
-  /* ---- Backend fallback (not found locally, or users.js missing) ---- */
   var orig = btn.textContent;
   btn.disabled = true; btn.textContent = 'Entering…';
   withSnake(function(){ return api('login', { email: email, code: code }); })
@@ -599,7 +612,9 @@ window.addEventListener('load', function(){
     try { user = JSON.parse(saved); enterApp(); }
     catch (e) { localStorage.removeItem(LS_USER); }
   }
-  fetch(API_URL + '?action=ping', {cache:'no-store'}).catch(function(){});
+  /* Try to paint from cached snapshot even before login */
+  var snap = readSnapshot();
+  if (snap) applySnapshot(snap);
 }, {once:true});
 
 function enterApp(){
@@ -624,59 +639,15 @@ function enterApp(){
   if (prefs.indFilter  && $('indFilter'))  $('indFilter').value  = prefs.indFilter;
   if (prefs.teamFilter && $('teamFilter')) $('teamFilter').value = prefs.teamFilter;
 
-  loadBootstrap();
-}
-
-function applyBootstrap(r){
-  if (r.months){
-    monthsList = r.months;
-    var prefs = loadPrefs(user.code);
-    if (prefs.month && monthsList.indexOf(prefs.month) !== -1) currentMonth = prefs.month;
-    else currentMonth = r.currentMonth || monthsList[0];
-    renderMonthTabs();
-    if (currentMonth !== (r.currentMonth || monthsList[0])){
-      switchMonth(currentMonth);
-    }
-  }
-  if (r.leaderboards){
-    indData  = r.leaderboards.individual || [];
-    teamData = r.leaderboards.team || [];
-    paintIndTable();
-    paintTeamTable();
-    if (user && currentMonth){
-      writeCache('aci_lb_' + user.code + '_' + currentMonth, r.leaderboards,
-                 currentMonth === monthsList[0] ? CACHE_TTL.lb : CACHE_TTL.lbOld);
-    }
-  }
-  if (r.global) renderGlobal(r.global);
-}
-
-function loadBootstrap(){
-  var cached = readCache('aci_boot_' + user.code);
-  var hadCache = false;
-  if (cached){
-    try { applyBootstrap(cached); hadCache = true; } catch(e){}
-  } else {
-    $('indLbBox').innerHTML  = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div></div>';
-    $('teamLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
-    $('globalBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
-  }
-  if (hadCache) showSync(true);
-  return withSnake(function(){ return api('bootstrap', {code: user.code}); }, hadCache)
-    .then(function(r){
-      if (r && r.success){
-        writeCache('aci_boot_' + user.code, r, CACHE_TTL.boot);
-        applyBootstrap(r);
-      }
-    })
-    .catch(function(e){ console.error(e); })
-    .finally(function(){ showSync(false); });
+  /* Paint from the cached snapshot immediately */
+  var snap = readSnapshot();
+  if (snap) applySnapshot(snap);
 }
 function refreshAll(btn){
   var o = btn.textContent;
-  btn.disabled = true; btn.textContent = 'Loading…';
-  try { localStorage.removeItem('aci_boot_' + user.code); } catch(e){}
-  loadBootstrap().then(function(){ btn.disabled = false; btn.textContent = o; });
+  btn.disabled = true; btn.textContent = 'Refreshing…';
+  /* Firebase will push on the next write or 1-minute trigger */
+  setTimeout(function(){ btn.disabled = false; btn.textContent = o; }, 700);
 }
 function prettyMonth(m){
   var parts = m.split('-');
@@ -695,33 +666,14 @@ function renderMonthTabs(){
 function switchMonth(m){
   currentMonth = m;
   renderMonthTabs();
-  var cacheKey = 'aci_lb_' + user.code + '_' + m;
-  var cached = readCache(cacheKey);
-  if (cached){
-    indData  = cached.individual || [];
-    teamData = cached.team || [];
+  var snap = readSnapshot();
+  if (snap && snap.leaderboards && snap.leaderboards[m]){
+    indData  = snap.leaderboards[m].individual || [];
+    teamData = snap.leaderboards[m].team || [];
     paintIndTable();
     paintTeamTable();
-  } else {
-    indData = null; teamData = null;
-    $('indLbBox').innerHTML  = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
-    $('teamLbBox').innerHTML = '<div class="skeleton"><div class="sk-line"></div><div class="sk-line"></div></div>';
   }
   persistIndexPrefs();
-  var isCurrent = (m === monthsList[0]);
-  if (cached && isCurrent) showSync(true);
-  withSnake(function(){ return api('getLeaderboards', {month: m}); }, !!cached)
-    .then(function(r){
-      if (!r || !r.success) return;
-      indData  = r.individual || [];
-      teamData = r.team || [];
-      paintIndTable();
-      paintTeamTable();
-      writeCache(cacheKey, {individual: indData, team: teamData, month: m},
-                 isCurrent ? CACHE_TTL.lb : CACHE_TTL.lbOld);
-    })
-    .catch(function(){ if (!cached){ indData = []; teamData = []; paintIndTable(); paintTeamTable(); } })
-    .finally(function(){ showSync(false); });
 }
 
 function renderGlobal(data){
@@ -755,12 +707,31 @@ function postGlobal(btn){
     .then(function(r){
       if (!r.success){ alert(r.message || 'Failed.'); return; }
       $('globalMsg').value = '';
-      try { localStorage.removeItem('aci_boot_' + user.code); } catch(e){}
-      return api('getGlobalPosts').then(function(g){ renderGlobal(g); });
+      /* Firebase will push the updated global feed within ~1 s */
     })
     .catch(function(e){ alert(e.message || 'Failed.'); })
     .finally(function(){ btn.disabled = false; btn.textContent = o; });
 }
+</script>
+
+<!-- FIREBASE REALTIME SUBSCRIBER -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+(function(){
+  if (!window.firebase) return;
+  firebase.initializeApp({
+    databaseURL: 'https://aci-careeredge-default-rtdb.asia-southeast1.firebasedatabase.app'
+  });
+  var lastTs = 0;
+  firebase.database().ref('snapshot').on('value', function(snap){
+    var data = snap.val();
+    if (!data || !data.ts || data.ts === lastTs) return;
+    lastTs = data.ts;
+    try { localStorage.setItem('aci_snapshot', JSON.stringify({ data: data, exp: Date.now() + 30*60*1000 })); } catch(e){}
+    if (typeof window.applySnapshot === 'function') window.applySnapshot(data);
+  });
+})();
 </script>
 </body>
 </html>
