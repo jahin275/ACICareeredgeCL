@@ -2,7 +2,7 @@
  * Cache-first app shell. Handles extensionless URLs (/team → /team.html).
  * Bump CACHE whenever you deploy new HTML/JS files.
  */
-const CACHE = 'aci-shell-v4';
+const CACHE = 'aci-shell-v5';
 const PRECACHE = [
   './',
   './index.html',
