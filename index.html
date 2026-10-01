@@ -200,9 +200,7 @@
   <div class="game-hint">Tap arrows or swipe to play</div>
 </div>
 
-<script src="./users.js"></script>
 <script>
-/* ---------- SERVICE WORKER ---------- */
 if ('serviceWorker' in navigator && location.protocol === 'https:'){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js').catch(function(){});
@@ -232,6 +230,7 @@ if (!isMobile){
 }
 
 var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
+var API_SECRET = '2904a8fe-af0d-42c6-8410-fd087b21ac33-862d8420-4d5a-4013-b0f5-e6cd03fd4e97';
 var $ = function(id){ return document.getElementById(id); };
 var LS_USER = 'aci_user';
 var user = null;
@@ -366,6 +365,7 @@ function startSnake(myId){
 /* ---------- API ---------- */
 function api(action, payload){
   payload = payload || {};
+  payload.secret = API_SECRET;
   var body = JSON.stringify(Object.assign({action: action}, payload));
   return fetch(API_URL, {
     method: 'POST',
@@ -406,7 +406,7 @@ function withSnake(fn, silent){
   });
 }
 
-/* ---------- LEADERBOARD STATE ---------- */
+/* ---------- LEADERBOARD ---------- */
 var indData = null, teamData = null;
 var indSort = {key:'points', dir:-1};
 var teamSort = {key:'points', dir:-1};
@@ -555,36 +555,47 @@ function applySnapshot(snap){
 }
 window.applySnapshot = applySnapshot;
 
-/* ---------- LOGIN ---------- */
+/* ---------- LOGIN (reads from snapshot) ---------- */
 function handleLogin(btn){
-  var email = $('loginEmail').value.trim();
+  var email = $('loginEmail').value.trim().toLowerCase();
   var code  = $('loginCode').value.trim().toUpperCase();
   $('loginError').textContent = '';
   $('loginOk').textContent = '';
   if (!email || !code){ $('loginError').textContent = 'Email and Code required.'; return; }
 
-  var localUser = null;
-  if (window.ACI_ROSTER && window.ACI_ROSTER.byEmail){
-    localUser = window.ACI_ROSTER.byEmail[email.toLowerCase() + '|' + code];
-  }
-  if (localUser){
-    user = localUser;
-    localStorage.setItem(LS_USER, JSON.stringify(user));
-    sessionStorage.setItem('aci_team_user', JSON.stringify(user));
-    $('loginOk').textContent = 'Welcome ' + user.name + '!';
-    enterApp();
-    api('login', { email: email, code: code })
-      .then(function(r){
-        if (!r.success){
-          localStorage.removeItem(LS_USER);
-          sessionStorage.removeItem('aci_team_user');
-          location.reload();
-        }
-      })
-      .catch(function(){});
-    return;
+  /* Try local snapshot first */
+  var snap = readSnapshot();
+  if (snap && snap.roster){
+    var found = null;
+    for (var c in snap.roster){
+      var r = snap.roster[c];
+      if (r.email && r.email.toLowerCase() === email && c === code){
+        found = { name: r.name, email: r.email, code: c,
+                  teamNumber: r.teamNumber, teamName: r.teamName, isAdmin: false };
+        break;
+      }
+    }
+    if (found){
+      user = found;
+      localStorage.setItem(LS_USER, JSON.stringify(user));
+      sessionStorage.setItem('aci_team_user', JSON.stringify(user));
+      $('loginOk').textContent = 'Welcome ' + user.name + '!';
+      enterApp();
+      /* Silently confirm with backend */
+      api('login', { email: email, code: code })
+        .then(function(r){
+          if (!r.success){
+            localStorage.removeItem(LS_USER);
+            sessionStorage.removeItem('aci_team_user');
+            location.reload();
+          }
+        })
+        .catch(function(){});
+      return;
+    }
   }
 
+  /* Fallback: backend */
   var orig = btn.textContent;
   btn.disabled = true; btn.textContent = 'Entering…';
   withSnake(function(){ return api('login', { email: email, code: code }); })
@@ -612,7 +623,6 @@ window.addEventListener('load', function(){
     try { user = JSON.parse(saved); enterApp(); }
     catch (e) { localStorage.removeItem(LS_USER); }
   }
-  /* Try to paint from cached snapshot even before login */
   var snap = readSnapshot();
   if (snap) applySnapshot(snap);
 }, {once:true});
@@ -639,14 +649,12 @@ function enterApp(){
   if (prefs.indFilter  && $('indFilter'))  $('indFilter').value  = prefs.indFilter;
   if (prefs.teamFilter && $('teamFilter')) $('teamFilter').value = prefs.teamFilter;
 
-  /* Paint from the cached snapshot immediately */
   var snap = readSnapshot();
   if (snap) applySnapshot(snap);
 }
 function refreshAll(btn){
   var o = btn.textContent;
   btn.disabled = true; btn.textContent = 'Refreshing…';
-  /* Firebase will push on the next write or 1-minute trigger */
   setTimeout(function(){ btn.disabled = false; btn.textContent = o; }, 700);
 }
 function prettyMonth(m){
@@ -707,14 +715,12 @@ function postGlobal(btn){
     .then(function(r){
       if (!r.success){ alert(r.message || 'Failed.'); return; }
       $('globalMsg').value = '';
-      /* Firebase will push the updated global feed within ~1 s */
     })
     .catch(function(e){ alert(e.message || 'Failed.'); })
     .finally(function(){ btn.disabled = false; btn.textContent = o; });
 }
 </script>
 
-<!-- FIREBASE REALTIME SUBSCRIBER -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
