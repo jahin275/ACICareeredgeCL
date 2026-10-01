@@ -188,7 +188,7 @@
           <div><button class="btn btn-secondary" style="width:100%;" onclick="clearFilters()">Clear</button></div>
         </div>
         <div style="font-size:.82em;color:#555;margin-bottom:8px;">
-          Showing <strong id="eCount">0</strong> (last 90 days, max 500)
+          Showing <strong id="eCount">0</strong> (last 30 days, max 400)
         </div>
         <div class="table-wrap">
           <table>
@@ -247,7 +247,6 @@
 
 <script src="./users.js"></script>
 <script>
-/* ---------- SERVICE WORKER ---------- */
 if ('serviceWorker' in navigator && location.protocol === 'https:'){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js').catch(function(){});
@@ -273,22 +272,17 @@ var $ = function(id){ return document.getElementById(id); };
 var user = null;
 var adminData = null;
 
-/* ---------- CACHE ---------- */
-function readCache(key){
+function readSnapshot(){
   try {
-    var raw = localStorage.getItem(key);
+    var raw = localStorage.getItem('aci_snapshot');
     if (!raw) return null;
     var obj = JSON.parse(raw);
-    if (obj.exp && obj.exp < Date.now()){ localStorage.removeItem(key); return null; }
+    if (obj.exp && obj.exp < Date.now()){ localStorage.removeItem('aci_snapshot'); return null; }
     return obj.data;
   } catch(e){ return null; }
 }
-function writeCache(key, data, ttlMs){
-  try { localStorage.setItem(key, JSON.stringify({ data: data, exp: Date.now() + (ttlMs || 2*60*1000) })); } catch(e){}
-}
 function showSync(on){ var d = $('syncDot'); if (d) d.style.display = on ? 'inline-block' : 'none'; }
 
-/* ---------- USER PREFS ---------- */
 function loadPrefs(code){
   try { return JSON.parse(localStorage.getItem('aci_prefs_' + code) || '{}'); }
   catch(e){ return {}; }
@@ -322,7 +316,7 @@ function logout(){
     var keys = [];
     for (var i = 0; i < localStorage.length; i++){
       var k = localStorage.key(i);
-      if (k && k.indexOf('aci_') === 0 && k.indexOf('aci_prefs_') !== 0) keys.push(k);
+      if (k && k.indexOf('aci_') === 0 && k.indexOf('aci_prefs_') !== 0 && k !== 'aci_snapshot') keys.push(k);
     }
     keys.forEach(function(k){ localStorage.removeItem(k); });
   } catch(e){}
@@ -347,48 +341,72 @@ window.addEventListener('load', function(){
     if (target) switchTab(prefs.adminTab, target);
   }
 
-  loadAdmin();
+  /* Paint from snapshot if available */
+  var snap = readSnapshot();
+  if (snap) applySnapshotAdmin(snap);
 }, {once:true});
 
-function loadAdmin(){
-  var cached = readCache('aci_admin');
-  if (cached){ try { applyAdmin(cached); } catch(e){} }
-  else {
-    ['teamsBody','topBody','entriesBody','usersBody'].forEach(function(id){
-      $(id).innerHTML = '<tr><td colspan="10" class="empty">Loading…</td></tr>';
+function applySnapshotAdmin(snap){
+  if (!snap || !snap.roster) return;
+
+  var roster = snap.roster;
+  var cur = snap.currentMonth;
+  var allStats = snap.allStats || { users: {}, teams: {} };
+  var curLb = (snap.leaderboards && snap.leaderboards[cur]) || { individual: [], team: [] };
+  var byCode = {};
+  curLb.individual.forEach(function(u){ byCode[u.code] = u; });
+
+  var users = [];
+  for (var c in roster){
+    var r = roster[c];
+    var u = byCode[c] || {};
+    var st = (allStats.users && allStats.users[c]) || {};
+    users.push({
+      code: c, name: r.name, teamNumber: r.teamNumber, teamName: r.teamName,
+      day: st.day || 0, week: st.week || 0, month: u.points || 0, total: st.total || 0,
+      entries: u.present || 0,
+      present: u.present || 0, absent: 0,
+      minutes: u.minutes || 0, promos: u.promos || 0, apps: u.apps || 0, regs: u.regs || 0
     });
   }
-  var silent = !!cached;
-  if (silent) showSync(true);
-  return api('getAdminData', {code: user.code})
-    .then(function(r){
-      if (!r.success){ if (!cached) alert(r.message || 'Failed.'); return; }
-      writeCache('aci_admin', r, 2*60*1000);
-      applyAdmin(r);
-    })
-    .catch(function(e){ if (!cached) alert(e.message || 'Failed to load.'); })
-    .finally(function(){ showSync(false); });
-}
+  users.sort(function(a,b){ return b.month - a.month || b.total - a.total; });
 
-function applyAdmin(r){
-  adminData = r;
-  paintStats(r.stats);
-  paintTeams(r.teams);
-  paintTop(r.users);
-  paintEntries(r.entries);
+  var teams = [];
+  for (var t = 1; t <= 8; t++){
+    var td = snap.teams && snap.teams[t];
+    if (!td) continue;
+    var ts = (allStats.teams && allStats.teams[t]) || {};
+    teams.push({
+      teamNumber: t, teamName: td.teamName,
+      members: td.members ? td.members.length : 0,
+      entries: td.totals ? td.totals.entries : 0,
+      day: ts.day || 0, week: ts.week || 0,
+      month: td.totals ? td.totals.month : 0,
+      total: ts.total || 0
+    });
+  }
+
+  var entries = snap.recentEntries || [];
+  adminData = { users: users, teams: teams, entries: entries };
+
+  var totalMonth = users.reduce(function(s,u){ return s + (u.month||0); }, 0);
+  var totalAll   = users.reduce(function(s,u){ return s + (u.total||0); }, 0);
+  $('sUsers').textContent    = users.length;
+  $('sTeams').textContent    = teams.length;
+  $('sEntries').textContent  = teams.reduce(function(s,t){ return s + (t.entries||0); }, 0);
+  $('sMonth').textContent    = Math.round(totalMonth * 100) / 100;
+  $('sAll').textContent      = Math.round(totalAll * 100) / 100;
+
+  paintTeams(teams);
+  paintTop(users);
+  paintEntries(entries);
   paintUsers();
-  paintAnnouncements(r.announcements);
-  paintPosts(r.recentPosts);
-  populateTeamFilter(r.teams);
+  paintAnnouncements(snap.global ? snap.global.announcements : []);
+  paintPosts(snap.global ? snap.global.posts : []);
+  populateTeamFilter(teams);
 }
+window.applySnapshotAdmin = applySnapshotAdmin;
 
-function paintStats(s){
-  $('sUsers').textContent = s.totalUsers;
-  $('sTeams').textContent = s.totalTeams;
-  $('sEntries').textContent = s.totalEntries;
-  $('sMonth').textContent = s.pointsThisMonth;
-  $('sAll').textContent = s.pointsAllTime;
-}
 function paintTeams(teams){
   var p = [];
   for (var i = 0; i < teams.length; i++){
@@ -548,8 +566,7 @@ function postAnnouncement(btn){
       $('annStatus').textContent = '✅ Published!';
       $('annStatus').className = 'ok';
       $('annMsg').value = '';
-      try { localStorage.removeItem('aci_admin'); } catch(e){}
-      loadAdmin();
+      /* Firebase will push the updated snapshot within ~1 s */
     })
     .catch(function(e){
       $('annStatus').textContent = e.message || 'Failed.';
@@ -570,6 +587,26 @@ function switchTab(name, btn){
     savePrefs(user.code, p);
   }
 }
+</script>
+
+<!-- FIREBASE REALTIME SUBSCRIBER -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+(function(){
+  if (!window.firebase) return;
+  firebase.initializeApp({
+    databaseURL: 'https://aci-careeredge-default-rtdb.asia-southeast1.firebasedatabase.app'
+  });
+  var lastTs = 0;
+  firebase.database().ref('snapshot').on('value', function(snap){
+    var data = snap.val();
+    if (!data || !data.ts || data.ts === lastTs) return;
+    lastTs = data.ts;
+    try { localStorage.setItem('aci_snapshot', JSON.stringify({ data: data, exp: Date.now() + 30*60*1000 })); } catch(e){}
+    if (typeof window.applySnapshotAdmin === 'function') window.applySnapshotAdmin(data);
+  });
+})();
 </script>
 </body>
 </html>
