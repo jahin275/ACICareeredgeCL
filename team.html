@@ -206,14 +206,12 @@
   <div class="game-hint">Tap arrows or swipe to play</div>
 </div>
 
-<script src="./users.js"></script>
 <script>
 if ('serviceWorker' in navigator && location.protocol === 'https:'){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js').catch(function(){});
   });
 }
-
 (function lockDown(){
   document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, {capture:true});
   document.addEventListener('keydown', function(e){
@@ -236,21 +234,10 @@ if (!isMobile){
 }
 
 var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAotlFIcK3vQDNfADIdVcNiMVshaFGZKhZqmGKNcGKYYA/exec';
+var API_SECRET = '2904a8fe-af0d-42c6-8410-fd087b21ac33-862d8420-4d5a-4013-b0f5-e6cd03fd4e97';
 var $ = function(id){ return document.getElementById(id); };
 var user = null;
 
-function readSnapshot(){
-  try {
-    var raw = localStorage.getItem('aci_snapshot');
-    if (!raw) return null;
-    var obj = JSON.parse(raw);
-    if (obj.exp && obj.exp < Date.now()){ localStorage.removeItem('aci_snapshot'); return null; }
-    return obj.data;
-  } catch(e){ return null; }
-}
-function writeCache(key, data, ttlMs){
-  try { localStorage.setItem(key, JSON.stringify({ data: data, exp: Date.now() + (ttlMs || 60*60*1000) })); } catch(e){}
-}
 function readCache(key){
   try {
     var raw = localStorage.getItem(key);
@@ -259,6 +246,10 @@ function readCache(key){
     if (obj.exp && obj.exp < Date.now()){ localStorage.removeItem(key); return null; }
     return obj.data;
   } catch(e){ return null; }
+}
+function readSnapshot(){ return readCache('aci_snapshot'); }
+function writeCache(key, data, ttlMs){
+  try { localStorage.setItem(key, JSON.stringify({ data: data, exp: Date.now() + (ttlMs || 60*60*1000) })); } catch(e){}
 }
 function clearUserCache(){
   try {
@@ -374,6 +365,7 @@ function startSnake(myId){
 /* ---------- API ---------- */
 function api(action, payload){
   payload = payload || {};
+  payload.secret = API_SECRET;
   var body = JSON.stringify(Object.assign({action: action}, payload));
   return fetch(API_URL, {
     method: 'POST',
@@ -447,7 +439,6 @@ function digitsOnly(el){
   el.addEventListener('drop', function(e){ e.preventDefault(); });
 }
 
-/* ---------- BOOT ---------- */
 window.addEventListener('load', function(){
   var saved = sessionStorage.getItem('aci_team_user') || localStorage.getItem('aci_user');
   if (!saved){ location.href = '/'; return; }
@@ -480,7 +471,6 @@ window.addEventListener('load', function(){
     if (sumBtn) switchView('summary', sumBtn);
   }
 
-  /* Paint from snapshot if available */
   var snap = readSnapshot();
   if (snap) applySnapshotTeam(snap);
 
@@ -620,7 +610,6 @@ function renderFeed(posts){
   $('feedBox').innerHTML = p.join('');
 }
 
-/* ---------- TEAM SUMMARY ---------- */
 var summarySort = {key: 'month', dir: -1};
 var summaryBadge = function(r){ return r <= 3 ? 'gold silver bronze'.split(' ')[r-1] : ''; };
 function summaryArrow(s, k){
@@ -729,7 +718,6 @@ document.addEventListener('click', function(e){
 })();
 </script>
 
-<!-- FIREBASE REALTIME SUBSCRIBER -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
