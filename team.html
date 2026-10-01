@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0a3d62">
-<title>Team — ACI Careeredge</title>
+<title>Work Submission — ACI Careeredge</title>
 <link rel="icon" href="./favicon.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
@@ -17,27 +17,21 @@
   body{user-select:none;-webkit-user-select:none;}
   input,textarea,select{user-select:text;-webkit-user-select:text;}
   img{-webkit-user-drag:none;pointer-events:none;}
-
   #sky{position:fixed;inset:0;z-index:-2;pointer-events:none;
-    background:
-      radial-gradient(circle at 20% 20%, #fff6 0 4px, transparent 5px),
+    background:radial-gradient(circle at 20% 20%, #fff6 0 4px, transparent 5px),
       radial-gradient(circle at 70% 40%, #fff6 0 6px, transparent 7px),
       linear-gradient(180deg, #1bddff 0%, #45e3ff 60%, #a8f0ff 100%);
-    background-size:200px 200px,300px 300px,100% 100%;
-    will-change:transform;}
+    background-size:200px 200px,300px 300px,100% 100%;will-change:transform;}
   #clouds{position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background-image:
-      radial-gradient(ellipse 80px 30px at 15% 15%, #fff, transparent 70%),
+    background-image:radial-gradient(ellipse 80px 30px at 15% 15%, #fff, transparent 70%),
       radial-gradient(ellipse 100px 35px at 60% 25%, #fff, transparent 70%);
     opacity:.5;will-change:transform;}
   #ground{position:fixed;bottom:0;left:0;width:100%;height:100px;z-index:-1;pointer-events:none;background:var(--ground);
     box-shadow:inset 0 6px 0 #1b5e20;
     background-image:repeating-linear-gradient(90deg,#2e7d32 0 40px,#276b2b 40px 80px);}
-
   header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;
     background:rgba(0,0,0,.4);backdrop-filter:blur(6px);border-bottom:4px solid #000;
-    position:sticky;top:0;z-index:50;
-    padding-top:max(10px, env(safe-area-inset-top));}
+    position:sticky;top:0;z-index:50;padding-top:max(10px, env(safe-area-inset-top));}
   .brand-wrap{display:flex;align-items:center;gap:10px;min-width:0;}
   .logo{height:40px;image-rendering:pixelated;flex-shrink:0;}
   .brand-title{font-family:'Press Start 2P',monospace;font-size:.75em;color:#fff;
@@ -47,9 +41,10 @@
   .user-info a{color:#fff;text-decoration:none;font-weight:800;padding:6px 8px;border-radius:6px;
     background:rgba(0,0,0,.25);border:2px solid #000;min-height:36px;display:inline-flex;align-items:center;}
   .user-info span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;}
-
-  .container{max-width:820px;margin:0 auto;padding:14px;
-    padding-bottom:max(20px, env(safe-area-inset-bottom));}
+  .syncing{display:inline-block;width:8px;height:8px;border-radius:50%;background:#2e7d32;margin-right:4px;
+    box-shadow:0 0 6px #2e7d32;animation:pulse 1.2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+  .container{max-width:820px;margin:0 auto;padding:14px;padding-bottom:max(20px, env(safe-area-inset-bottom));}
   .card{background:var(--card);border:4px solid #000;border-radius:12px;padding:16px;margin-bottom:14px;
     box-shadow:5px 5px 0 rgba(0,0,0,.35);}
   .card h2,.card h3{margin-bottom:10px;font-size:1.05em;}
@@ -67,19 +62,6 @@
   .btn-primary{background:var(--ground);color:#fff;}
   .btn-warn{background:var(--orange);color:#fff;}
   .btn-secondary{background:#b0bec5;}
-
-  .stats-card{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
-    background:var(--card);border:4px solid #000;border-radius:12px;padding:12px;margin-bottom:14px;
-    box-shadow:5px 5px 0 rgba(0,0,0,.35);}
-  .stat-box{text-align:center;padding:10px 4px;border:3px solid #000;border-radius:8px;
-    background:#e0f7fa;box-shadow:2px 2px 0 #000;}
-  .stat-box.total{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;text-shadow:1px 1px 0 #000;}
-  .stat-box.team{background:linear-gradient(135deg,#5c6bc0,#3949ab);color:#fff;text-shadow:1px 1px 0 #000;}
-  .stat-label{font-family:'Press Start 2P',monospace;font-size:.5em;margin-bottom:6px;display:block;color:#333;}
-  .stat-box.total .stat-label,.stat-box.team .stat-label{color:#fff;}
-  .stat-value{font-family:'Press Start 2P',monospace;font-size:1em;font-weight:900;color:#0d2b3e;}
-  .stat-box.total .stat-value,.stat-box.team .stat-value{color:#fff;}
-
   .pill{display:inline-block;padding:3px 9px;border-radius:12px;background:#e0f7fa;border:2px solid #000;
     font-size:.76em;font-weight:700;margin:2px 4px 2px 0;}
   .pill.absent{background:#ffcdd2;}
@@ -102,7 +84,6 @@
   .banner h2{font-size:1.05em;line-height:1.2;}
   .banner .sub{font-size:.82em;opacity:.95;}
   .note{font-size:.78em;color:#555;font-style:italic;margin:-4px 0 8px;}
-
   .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
   .sum-box{text-align:center;padding:10px 4px;border:3px solid #000;border-radius:8px;background:#f5f5f5;
     box-shadow:2px 2px 0 #000;}
@@ -110,12 +91,10 @@
   .sum-value{font-family:'Press Start 2P',monospace;font-size:.9em;font-weight:900;color:var(--dark);}
   .sum-box.highlight{background:linear-gradient(135deg,#ffb347,#ff8c00);color:#fff;}
   .sum-box.highlight .sum-label,.sum-box.highlight .sum-value{color:#fff;}
-
   .switch{display:flex;gap:6px;margin-bottom:12px;}
   .switch button{flex:1;padding:10px;border:3px solid #000;border-radius:8px;background:#fff;
     font-weight:800;font-size:.85em;box-shadow:2px 2px 0 #000;cursor:pointer;touch-action:manipulation;min-height:44px;}
   .switch button.active{background:var(--dark);color:#fff;}
-
   #snakeOverlay{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;flex-direction:column;
     justify-content:center;align-items:center;z-index:200;padding:10px;touch-action:none;}
   #snakeOverlay.show{display:flex;}
@@ -123,14 +102,10 @@
   .game-label{color:#fff;font-family:'Courier New',monospace;margin-bottom:6px;font-size:.95em;text-align:center;}
   .game-score{color:var(--orange);font-family:'Courier New',monospace;font-size:1.2em;font-weight:900;margin-bottom:4px;}
   .game-hint{color:#aaa;font-size:.78em;margin-top:8px;text-align:center;}
-
   @media(max-width:600px){
     .brand-title{font-size:.68em;} .logo{height:36px;}
-    .container{padding:10px;}
-    .card{padding:12px;}
+    .container{padding:10px;} .card{padding:12px;}
     .grid2{grid-template-columns:1fr;}
-    .stats-card{grid-template-columns:repeat(3,1fr);padding:10px;gap:6px;}
-    .stat-value{font-size:.9em;} .stat-label{font-size:.45em;}
     .team-dp{width:48px;height:48px;}
     .summary-grid{grid-template-columns:repeat(2,1fr);}
     table{font-size:.78em;} th,td{padding:6px 6px;}
@@ -152,6 +127,7 @@
   </div>
   <div class="user-info">
     <a href="index.html">←</a>
+    <span id="syncDot" class="syncing" style="display:none;"></span>
     <span id="headerName"></span>
     <button class="btn btn-warn" style="padding:6px 10px;min-height:0;font-size:.78em;" onclick="logout()">Logout</button>
   </div>
@@ -166,16 +142,8 @@
     </div>
   </div>
 
-  <div class="stats-card">
-    <div class="stat-box"><span class="stat-label">TODAY</span><div class="stat-value" id="statDay">0</div></div>
-    <div class="stat-box"><span class="stat-label">WEEK</span><div class="stat-value" id="statWeek">0</div></div>
-    <div class="stat-box"><span class="stat-label">MONTH</span><div class="stat-value" id="statMonth">0</div></div>
-    <div class="stat-box total"><span class="stat-label">YOU</span><div class="stat-value" id="statTotal">0</div></div>
-    <div class="stat-box team"><span class="stat-label">TEAM</span><div class="stat-value" id="statTeam">0</div></div>
-  </div>
-
   <div class="card">
-    <h3 id="formTitle">📝 Submit Your Work</h3>
+    <h3 id="formTitle">📝 Work Submission</h3>
     <label>📅 Date</label>
     <input type="date" id="eDate">
     <div class="grid2">
@@ -248,8 +216,7 @@ var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 if (!isMobile){
   window.addEventListener('scroll', function(){
     var y = window.pageYOffset;
-    var s = document.getElementById('sky');
-    var c = document.getElementById('clouds');
+    var s = document.getElementById('sky'); var c = document.getElementById('clouds');
     if (s) s.style.transform = 'translateY(' + (y * 0.35) + 'px)';
     if (c) c.style.transform = 'translateY(' + (y * 0.6) + 'px)';
   }, {passive:true});
@@ -259,34 +226,46 @@ var API_URL = 'https://script.google.com/macros/s/AKfycbyp-3MaW7JqdPgNN0lDw3RnAo
 var $ = function(id){ return document.getElementById(id); };
 var user = null;
 
+/* ---------- CLIENT CACHE ---------- */
+var CACHE_TTL = { entry: 60*60*1000, feed: 2*60*1000, sum: 3*60*1000 };
+function readCache(key){
+  try {
+    var raw = localStorage.getItem(key);
+    if (!raw) return null;
+    var obj = JSON.parse(raw);
+    if (obj.exp && obj.exp < Date.now()){ localStorage.removeItem(key); return null; }
+    return obj.data;
+  } catch(e){ return null; }
+}
+function writeCache(key, data, ttlMs){
+  try { localStorage.setItem(key, JSON.stringify({ data: data, exp: Date.now() + (ttlMs || CACHE_TTL.entry) })); } catch(e){}
+}
+function clearUserCache(){
+  try {
+    var keys = [];
+    for (var i = 0; i < localStorage.length; i++){
+      var k = localStorage.key(i);
+      if (k && k.indexOf('aci_') === 0) keys.push(k);
+    }
+    keys.forEach(function(k){ localStorage.removeItem(k); });
+  } catch(e){}
+}
+function showSync(on){ var d = $('syncDot'); if (d) d.style.display = on ? 'inline-block' : 'none'; }
+
 /* ---------- SNAKE ---------- */
 var snakeGameId = 0;
-function showSnake(){
-  snakeGameId++;
-  var id = snakeGameId;
-  $('snakeOverlay').classList.add('show');
-  startSnake(id);
-}
-function hideSnake(){
-  snakeGameId++;
-  $('snakeOverlay').classList.remove('show');
-}
+function showSnake(){ snakeGameId++; var id = snakeGameId; $('snakeOverlay').classList.add('show'); startSnake(id); }
+function hideSnake(){ snakeGameId++; $('snakeOverlay').classList.remove('show'); }
 function startSnake(myId){
   var oldCanvas = $('snakeCanvas');
   var canvas = oldCanvas.cloneNode(true);
   oldCanvas.parentNode.replaceChild(canvas, oldCanvas);
   var ctx = canvas.getContext('2d');
-  var GRID = 16;
-  var SIZE = canvas.width / GRID;
+  var GRID = 16, SIZE = canvas.width / GRID;
   var codes = ['1','2','3','4','5','6','7','8'];
   var imgs = codes.map(function(c){ var i = new Image(); i.src = './' + c + '.png'; return i; });
-
-  var state = {
-    snake: [{x:8,y:8},{x:7,y:8},{x:6,y:8}],
-    dir: {x:1,y:0},
-    food: {x:12,y:8,idx:0},
-    score: 0, over: false
-  };
+  var state = { snake: [{x:8,y:8},{x:7,y:8},{x:6,y:8}], dir: {x:1,y:0},
+                food: {x:12,y:8,idx:0}, score: 0, over: false };
   function placeFood(){
     var attempts = 0;
     do {
@@ -297,8 +276,7 @@ function startSnake(myId){
     } while (state.snake.some(function(s){ return s.x === state.food.x && s.y === state.food.y; }) && attempts < 50);
   }
   function draw(){
-    ctx.fillStyle = '#0a0a0a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = '#1f1f1f';
     for (var i = 0; i <= GRID; i++){
       ctx.beginPath(); ctx.moveTo(i*SIZE, 0); ctx.lineTo(i*SIZE, canvas.height); ctx.stroke();
@@ -311,12 +289,8 @@ function startSnake(myId){
       ctx.strokeRect(s.x*SIZE+1, s.y*SIZE+1, SIZE-2, SIZE-2);
     });
     var img = imgs[state.food.idx];
-    if (img.complete && img.naturalWidth){
-      ctx.drawImage(img, state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
-    } else {
-      ctx.fillStyle = '#ff8c00';
-      ctx.fillRect(state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
-    }
+    if (img.complete && img.naturalWidth) ctx.drawImage(img, state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE);
+    else { ctx.fillStyle = '#ff8c00'; ctx.fillRect(state.food.x*SIZE, state.food.y*SIZE, SIZE, SIZE); }
     $('snakeScore').textContent = state.score;
   }
   function step(){
@@ -349,15 +323,11 @@ function startSnake(myId){
     if (k.indexOf('Arrow') === 0) e.preventDefault();
   };
   document.addEventListener('keydown', keyHandler);
-
   var tsX = 0, tsY = 0;
-  canvas.addEventListener('touchstart', function(e){
-    tsX = e.touches[0].clientX; tsY = e.touches[0].clientY;
-  }, {passive:true});
+  canvas.addEventListener('touchstart', function(e){ tsX = e.touches[0].clientX; tsY = e.touches[0].clientY; }, {passive:true});
   canvas.addEventListener('touchend', function(e){
     if (myId !== snakeGameId) return;
-    var dx = e.changedTouches[0].clientX - tsX;
-    var dy = e.changedTouches[0].clientY - tsY;
+    var dx = e.changedTouches[0].clientX - tsX, dy = e.changedTouches[0].clientY - tsY;
     if (Math.abs(dx) > Math.abs(dy)){
       if (dx > 0 && state.dir.x === 0) state.dir = {x:1,y:0};
       else if (dx < 0 && state.dir.x === 0) state.dir = {x:-1,y:0};
@@ -366,18 +336,11 @@ function startSnake(myId){
       else if (dy < 0 && state.dir.y === 0) state.dir = {x:0,y:-1};
     }
   }, {passive:true});
-
   var tick = setInterval(function(){
-    if (myId !== snakeGameId){
-      clearInterval(tick);
-      document.removeEventListener('keydown', keyHandler);
-      return;
-    }
+    if (myId !== snakeGameId){ clearInterval(tick); document.removeEventListener('keydown', keyHandler); return; }
     step();
   }, 160);
-
-  placeFood();
-  draw();
+  placeFood(); draw();
 }
 
 /* ---------- API ---------- */
@@ -416,12 +379,15 @@ function debounce(fn, ms){
   };
 }
 var snakeShown = false;
-function withSnake(fn){
-  var timer = setTimeout(function(){
-    if (!snakeShown){ snakeShown = true; showSnake(); }
-  }, 450);
+function withSnake(fn, silent){
+  var timer = null;
+  if (!silent){
+    timer = setTimeout(function(){
+      if (!snakeShown){ snakeShown = true; showSnake(); }
+    }, 450);
+  }
   return Promise.resolve().then(fn).finally(function(){
-    clearTimeout(timer);
+    if (timer) clearTimeout(timer);
     if (snakeShown){
       snakeShown = false;
       setTimeout(hideSnake, 180);
@@ -429,12 +395,12 @@ function withSnake(fn){
   });
 }
 function logout(){
+  clearUserCache();
   localStorage.removeItem('aci_user');
-  sessionStorage.removeItem('aci_team_user');
+  sessionStorage.clear();
   location.href = 'index.html';
 }
 
-/* ---------- DIGITS ONLY ---------- */
 function digitsOnly(el){
   el.addEventListener('input', function(){
     var v = this.value.replace(/[^0-9]/g, '');
@@ -461,10 +427,7 @@ window.addEventListener('load', function(){
   try { user = JSON.parse(saved); }
   catch (e){ location.href = 'index.html'; return; }
 
-  if (!user.teamNumber || user.teamNumber === 0){
-    location.href = 'index.html';
-    return;
-  }
+  if (!user.teamNumber || user.teamNumber === 0){ location.href = 'index.html'; return; }
 
   var t = Number(new URLSearchParams(location.search).get('t'));
   if (t && t !== user.teamNumber){ location.replace('team.html?t=' + user.teamNumber); return; }
@@ -486,7 +449,7 @@ window.addEventListener('load', function(){
   digitsOnly($('eMinutes'));
   digitsOnly($('ePromos'));
 
-  loadStats();
+  /* instant paint from cache, then silent refresh */
   loadMyEntry();
   loadTeamPosts();
   loadTeamSummary();
@@ -501,44 +464,41 @@ function switchView(name, btn){
   if (name === 'summary') loadTeamSummary();
 }
 
-function paintStats(s){
-  $('statDay').textContent   = s.day;
-  $('statWeek').textContent  = s.week;
-  $('statMonth').textContent = s.month;
-  $('statTotal').textContent = s.total;
-  $('statTeam').textContent  = s.teamMonth;
-}
-
-function loadStats(){
-  withSnake(function(){ return api('getStats', {code: user.code}); })
-    .then(function(r){ if (r.success) paintStats(r); })
-    .catch(function(){});
-}
-
 function loadMyEntry(){
   var date = $('eDate').value;
   if (!date) return;
   $('formMsg').textContent = '';
-  withSnake(function(){ return api('getMyEntry', {code: user.code, date: date}); })
+  var cacheKey = 'aci_entry_' + user.code + '_' + date;
+  var cached = readCache(cacheKey);
+
+  function apply(entry){
+    if (entry){
+      $('formTitle').textContent = '✏️ Edit Work Submission — ' + date;
+      $('submitBtn').textContent = '💾 Update Entry';
+      $('eAttendance').value = entry.attendance || 'Present';
+      $('eMinutes').value = entry.minutes;
+      $('ePromos').value  = entry.promos;
+      $('eRemarks').value = entry.remarks || '';
+    } else {
+      $('formTitle').textContent = '📝 Work Submission';
+      $('submitBtn').textContent = '🚀 Submit';
+      $('eAttendance').value = 'Present';
+      $('eMinutes').value = 0;
+      $('ePromos').value = 0;
+      $('eRemarks').value = '';
+    }
+  }
+  if (cached !== null) apply(cached.entry || null);
+  var silent = cached !== null;
+  if (silent) showSync(true);
+  withSnake(function(){ return api('getMyEntry', {code: user.code, date: date}); }, silent)
     .then(function(r){
-      var e = r.entry;
-      if (e){
-        $('formTitle').textContent = '✏️ Edit Your Entry for ' + date;
-        $('submitBtn').textContent = '💾 Update Entry';
-        $('eAttendance').value = e.attendance || 'Present';
-        $('eMinutes').value = e.minutes;
-        $('ePromos').value  = e.promos;
-        $('eRemarks').value = e.remarks || '';
-      } else {
-        $('formTitle').textContent = '📝 Submit Your Work';
-        $('submitBtn').textContent = '🚀 Submit';
-        $('eAttendance').value = 'Present';
-        $('eMinutes').value = 0;
-        $('ePromos').value = 0;
-        $('eRemarks').value = '';
-      }
+      var e = r.entry || null;
+      writeCache(cacheKey, {entry: e}, CACHE_TTL.entry);
+      apply(e);
     })
-    .catch(function(){});
+    .catch(function(){})
+    .finally(function(){ showSync(false); });
 }
 
 function submitEntry(btn){
@@ -566,7 +526,20 @@ function submitEntry(btn){
       }
       $('formMsg').textContent = r.updated ? '✅ Entry updated!' : '✅ Entry saved!';
       $('formMsg').className = 'ok';
-      return Promise.all([loadStats(), loadMyEntry(), loadTeamPosts(), loadTeamSummary()]);
+      /* invalidate this page's cache + the leaderboard bootstrap on index.html */
+      try {
+        localStorage.removeItem('aci_entry_' + user.code + '_' + date);
+        localStorage.removeItem('aci_boot_' + user.code);
+        localStorage.removeItem('aci_feed_' + user.teamNumber);
+        localStorage.removeItem('aci_sum_' + user.teamNumber);
+        var keysToNuke = [];
+        for (var i = 0; i < localStorage.length; i++){
+          var k = localStorage.key(i);
+          if (k && k.indexOf('aci_lb_' + user.code + '_') === 0) keysToNuke.push(k);
+        }
+        keysToNuke.forEach(function(k){ localStorage.removeItem(k); });
+      } catch(e){}
+      return Promise.all([loadMyEntry(), loadTeamPosts(true), loadTeamSummary(true)]);
     })
     .catch(function(e){
       $('formMsg').textContent = e.message || 'Failed. Try again.';
@@ -575,83 +548,107 @@ function submitEntry(btn){
     .finally(function(){ btn.disabled = false; btn.textContent = o; });
 }
 
-function loadTeamPosts(){
-  if (!$('feedBox').innerHTML) $('feedBox').innerHTML = '<p class="empty">Loading…</p>';
-  withSnake(function(){ return api('getTeamPosts', {teamNumber: user.teamNumber}); })
+function loadTeamPosts(force){
+  var cacheKey = 'aci_feed_' + user.teamNumber;
+  var cached = readCache(cacheKey);
+  if (cached && !force){
+    renderFeed(cached);
+  } else if (!cached){
+    $('feedBox').innerHTML = '<p class="empty">Loading…</p>';
+  }
+  var silent = !!cached && !force;
+  if (silent) showSync(true);
+  withSnake(function(){ return api('getTeamPosts', {teamNumber: user.teamNumber}); }, silent)
     .then(function(r){
       var posts = r.posts || [];
-      if (!posts.length){
-        $('feedBox').innerHTML = '<p class="empty">No entries from your team for today or yesterday yet.</p>';
-        return;
-      }
-      var p = [];
-      for (var i = 0; i < posts.length; i++){
-        var x = posts[i];
-        var mine = x.code === user.code ? ' mine' : '';
-        var attCls = x.attendance === 'Absent' ? 'absent' : 'present';
-        var dt = new Date(x.updatedAt).toLocaleString();
-        p.push(
-          '<div class="post' + mine + '">' +
-            '<div class="post-head">' +
-              '<div><span class="post-name">' + esc(x.name) + '</span> ' +
-              '<span style="color:#666;font-size:.82em;">(' + esc(x.code) + ')</span></div>' +
-              '<div class="post-date">' + esc(x.date) + '</div>' +
-            '</div>' +
-            '<div>' +
-              '<span class="pill ' + attCls + '">' + esc(x.attendance) + '</span>' +
-              '<span class="pill">⏱ ' + x.minutes + 'm</span>' +
-              '<span class="pill">📢 ' + x.promos + '</span>' +
-              '<span class="pill readonly">📝 ' + x.apps + '</span>' +
-              '<span class="pill readonly">✅ ' + x.regs + '</span>' +
-            '</div>' +
-            (x.remarks ? '<div style="margin-top:6px;font-style:italic;color:#333;">“' + esc(x.remarks) + '”</div>' : '') +
-          '</div>'
-        );
-      }
-      $('feedBox').innerHTML = p.join('');
+      writeCache(cacheKey, posts, CACHE_TTL.feed);
+      renderFeed(posts);
     })
-    .catch(function(){ $('feedBox').innerHTML = '<p class="err">Failed to load feed.</p>'; });
+    .catch(function(){ if (!cached) $('feedBox').innerHTML = '<p class="err">Failed to load feed.</p>'; })
+    .finally(function(){ showSync(false); });
 }
 
-function loadTeamSummary(){
-  if (!$('membersBox').innerHTML) $('membersBox').innerHTML = '<p class="empty">Loading…</p>';
-  api('getTeamSummary', {teamNumber: user.teamNumber})
+function renderFeed(posts){
+  if (!posts || !posts.length){
+    $('feedBox').innerHTML = '<p class="empty">No entries from your team for today or yesterday yet.</p>';
+    return;
+  }
+  var p = [];
+  for (var i = 0; i < posts.length; i++){
+    var x = posts[i];
+    var mine = x.code === user.code ? ' mine' : '';
+    var attCls = x.attendance === 'Absent' ? 'absent' : 'present';
+    var dt = new Date(x.updatedAt).toLocaleString();
+    p.push(
+      '<div class="post' + mine + '">' +
+        '<div class="post-head">' +
+          '<div><span class="post-name">' + esc(x.name) + '</span> ' +
+          '<span style="color:#666;font-size:.82em;">(' + esc(x.code) + ')</span></div>' +
+          '<div class="post-date">' + esc(x.date) + '</div>' +
+        '</div>' +
+        '<div>' +
+          '<span class="pill ' + attCls + '">' + esc(x.attendance) + '</span>' +
+          '<span class="pill">⏱ ' + x.minutes + 'm</span>' +
+          '<span class="pill">📢 ' + x.promos + '</span>' +
+          '<span class="pill readonly">📝 ' + x.apps + '</span>' +
+          '<span class="pill readonly">✅ ' + x.regs + '</span>' +
+        '</div>' +
+        (x.remarks ? '<div style="margin-top:6px;font-style:italic;color:#333;">"' + esc(x.remarks) + '"</div>' : '') +
+      '</div>'
+    );
+  }
+  $('feedBox').innerHTML = p.join('');
+}
+
+function loadTeamSummary(force){
+  var cacheKey = 'aci_sum_' + user.teamNumber;
+  var cached = readCache(cacheKey);
+  if (cached && !force) renderSummary(cached);
+  else if (!cached) $('membersBox').innerHTML = '<p class="empty">Loading…</p>';
+  var silent = !!cached && !force;
+  if (silent) showSync(true);
+  withSnake(function(){ return api('getTeamSummary', {teamNumber: user.teamNumber}); }, silent)
     .then(function(r){
       if (!r.success) return;
-      var t = r.totals;
-      $('tsToday').textContent = t.day;
-      $('tsWeek').textContent  = t.week;
-      $('tsMonth').textContent = t.month;
-      $('tsAll').textContent   = t.total;
-      $('tsMin').textContent   = t.minutes;
-      $('tsPromo').textContent = t.promos;
-      $('tsApps').textContent  = t.apps;
-      $('tsRegs').textContent  = t.regs;
-
-      var members = r.members || [];
-      if (!members.length){
-        $('membersBox').innerHTML = '<p class="empty">No members on this team yet.</p>';
-        return;
-      }
-      var p = ['<h4 style="margin-top:10px;">🏅 Member Rankings</h4>',
-               '<table><thead><tr><th>#</th><th>Name</th><th>Month</th><th>All</th><th>Att%</th></tr></thead><tbody>'];
-      for (var i = 0; i < members.length; i++){
-        var m = members[i];
-        var tot = m.present + m.absent;
-        var pct = tot ? Math.round(m.present / tot * 100) : 0;
-        var me = m.code === user.code ? ' class="me"' : '';
-        p.push('<tr' + me + '>' +
-          '<td>' + m.rank + '</td>' +
-          '<td>' + esc(m.name) + '<div style="font-size:.7em;color:#666;">' + esc(m.code) + '</div></td>' +
-          '<td><strong>' + m.month + '</strong></td>' +
-          '<td>' + m.total + '</td>' +
-          '<td>' + pct + '%</td>' +
-        '</tr>');
-      }
-      p.push('</tbody></table>');
-      $('membersBox').innerHTML = p.join('');
+      writeCache(cacheKey, r, CACHE_TTL.sum);
+      renderSummary(r);
     })
-    .catch(function(){ $('membersBox').innerHTML = '<p class="err">Failed to load summary.</p>'; });
+    .catch(function(){ if (!cached) $('membersBox').innerHTML = '<p class="err">Failed to load summary.</p>'; })
+    .finally(function(){ showSync(false); });
+}
+
+function renderSummary(r){
+  var t = r.totals;
+  $('tsToday').textContent = t.day;
+  $('tsWeek').textContent  = t.week;
+  $('tsMonth').textContent = t.month;
+  $('tsAll').textContent   = t.total;
+  $('tsMin').textContent   = t.minutes;
+  $('tsPromo').textContent = t.promos;
+  $('tsApps').textContent  = t.apps;
+  $('tsRegs').textContent  = t.regs;
+
+  var members = r.members || [];
+  if (!members.length){
+    $('membersBox').innerHTML = '<p class="empty">No members on this team yet.</p>';
+    return;
+  }
+  /* Attendance shown as (Present / Absent) counts, NOT percentage */
+  var p = ['<h4 style="margin-top:10px;">🏅 Member Rankings</h4>',
+           '<table><thead><tr><th>#</th><th>Name</th><th>Month</th><th>All</th><th>Att (P/A)</th></tr></thead><tbody>'];
+  for (var i = 0; i < members.length; i++){
+    var m = members[i];
+    var me = m.code === user.code ? ' class="me"' : '';
+    p.push('<tr' + me + '>' +
+      '<td>' + m.rank + '</td>' +
+      '<td>' + esc(m.name) + '<div style="font-size:.7em;color:#666;">' + esc(m.code) + '</div></td>' +
+      '<td><strong>' + m.month + '</strong></td>' +
+      '<td>' + m.total + '</td>' +
+      '<td>' + (m.present || 0) + ' / ' + (m.absent || 0) + '</td>' +
+    '</tr>');
+  }
+  p.push('</tbody></table>');
+  $('membersBox').innerHTML = p.join('');
 }
 </script>
 </body>
