@@ -19,7 +19,7 @@ window.ACI_ROSTER = (function(){
     { name: 'Sk Ishraaq Arefin',         email: 'ishraaqarefin@gmail.com',                   code: 'CL0111', teamNumber: 1, teamName: 'Brokers' },
     { name: 'Ahmad Fahim  Shahriar',     email: 'Fahim.eee.00724105131005@aust.edu',         code: 'CL0101', teamNumber: 1, teamName: 'Brokers' },
     { name: 'Khatune Jannat Bonna',      email: 'khatunejannatb@gmail.com',                  code: 'CL0121', teamNumber: 1, teamName: 'Brokers' },
-    { name: 'Nusrat Jahan Richi',        email: 'richienusrat@gmail. com',                    code: 'CL0108', teamNumber: 1, teamName: 'Brokers' },
+    { name: 'Nusrat Jahan Richi',        email: 'richienusrat@gmail.com',                    code: 'CL0108', teamNumber: 1, teamName: 'Brokers' },
     { name: 'Mashrur Abedin Fahad',      email: 'mashrurfahad@gmail.com',                    code: 'CL0152', teamNumber: 1, teamName: 'Brokers' },
     { name: 'Raduone Hossain Mahi',      email: 'raduone.21ais046@gstu.edu.bd',              code: 'CL0117', teamNumber: 1, teamName: 'Brokers' },
     { name: 'S M Adnan Ahmed',           email: 'adnanasami260@gmail.com',                   code: 'CL0171', teamNumber: 1, teamName: 'Brokers' },
@@ -88,7 +88,7 @@ window.ACI_ROSTER = (function(){
     { name: 'Abdullah Wasi',             email: 'abdullahwasi2022@gmail.com',                code: 'CL0172', teamNumber: 7, teamName: 'H2O' },
     { name: 'Tasmia Tahira Alam',        email: 'tasmiaalam880@gmail.com',                   code: 'CL0148', teamNumber: 7, teamName: 'H2O' },
     { name: 'Baitul Sazara',             email: 'baitulsazarao@gmail.com',                   code: 'CL0153', teamNumber: 7, teamName: 'H2O' },
-    { name: 'Abu Nasher Chowdhury',      email: 'abunasherc@gmail',                          code: 'CL0166', teamNumber: 7, teamName: 'H2O' },
+    { name: 'Abu Nasher Chowdhury',      email: 'abunasherc@gmail.com',                          code: 'CL0166', teamNumber: 7, teamName: 'H2O' },
     { name: 'Md. Hasibul Hasan',         email: 'mdhasibulhasan203@gmail.com',               code: 'CL0109', teamNumber: 7, teamName: 'H2O' },
     { name: 'Jubaida Islam Jui',         email: 'jubaidaislam040@gmail.com',                 code: 'CL0168', teamNumber: 7, teamName: 'H2O' },
 
