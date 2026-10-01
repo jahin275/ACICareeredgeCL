@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://fonts.googleapis.com">
 <link rel="preload" as="image" href="./LOGO.png">
+<link rel="prefetch" href="./index.html">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#1bddff;--ground:#2e7d32;--card:rgba(255,255,255,.94);--orange:#ff8c00;--text:#1a1a1a;--dark:#0d2b3e;--red:#c62828;}
@@ -145,10 +146,10 @@
     </div>
 
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('overview', this)">📊 Overview</button>
-      <button class="tab" onclick="switchTab('entries', this)">📋 Entries</button>
-      <button class="tab" onclick="switchTab('users', this)">👥 Users</button>
-      <button class="tab" onclick="switchTab('global', this)">🌍 Global</button>
+      <button class="tab active" data-tab="overview" onclick="switchTab('overview', this)">📊 Overview</button>
+      <button class="tab" data-tab="entries" onclick="switchTab('entries', this)">📋 Entries</button>
+      <button class="tab" data-tab="users" onclick="switchTab('users', this)">👥 Users</button>
+      <button class="tab" data-tab="global" onclick="switchTab('global', this)">🌍 Global</button>
     </div>
 
     <div id="tab-overview" class="tab-content">
@@ -245,6 +246,13 @@
 </div>
 
 <script>
+/* ---------- SERVICE WORKER ---------- */
+if ('serviceWorker' in navigator && location.protocol === 'https:'){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+
 (function lockDown(){
   document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, {capture:true});
   document.addEventListener('dragstart', function(e){ e.preventDefault(); }, {capture:true});
@@ -275,9 +283,18 @@ function readCache(key){
   } catch(e){ return null; }
 }
 function writeCache(key, data, ttlMs){
-  try { localStorage.setItem(key, JSON.stringify({ data: data, exp: Date.now() + (ttlMs || 5*60*1000) })); } catch(e){}
+  try { localStorage.setItem(key, JSON.stringify({ data: data, exp: Date.now() + (ttlMs || 2*60*1000) })); } catch(e){}
 }
 function showSync(on){ var d = $('syncDot'); if (d) d.style.display = on ? 'inline-block' : 'none'; }
+
+/* ---------- USER PREFS ---------- */
+function loadPrefs(code){
+  try { return JSON.parse(localStorage.getItem('aci_prefs_' + code) || '{}'); }
+  catch(e){ return {}; }
+}
+function savePrefs(code, obj){
+  try { localStorage.setItem('aci_prefs_' + code, JSON.stringify(obj)); } catch(e){}
+}
 
 function api(action, payload){
   payload = payload || {};
@@ -304,7 +321,7 @@ function logout(){
     var keys = [];
     for (var i = 0; i < localStorage.length; i++){
       var k = localStorage.key(i);
-      if (k && k.indexOf('aci_') === 0) keys.push(k);
+      if (k && k.indexOf('aci_') === 0 && k.indexOf('aci_prefs_') !== 0) keys.push(k);
     }
     keys.forEach(function(k){ localStorage.removeItem(k); });
   } catch(e){}
@@ -322,6 +339,14 @@ window.addEventListener('load', function(){
   $('guardView').style.display = 'none';
   $('adminView').style.display = 'block';
   $('headerName').textContent = user.name + ' (' + user.code + ')';
+
+  /* Restore tab preference */
+  var prefs = loadPrefs(user.code);
+  if (prefs.adminTab){
+    var target = document.querySelector('.tab[data-tab="' + prefs.adminTab + '"]');
+    if (target) switchTab(prefs.adminTab, target);
+  }
+
   loadAdmin();
 }, {once:true});
 
@@ -539,6 +564,11 @@ function switchTab(name, btn){
   var contents = document.querySelectorAll('.tab-content');
   for (var j = 0; j < contents.length; j++) contents[j].style.display = 'none';
   $('tab-' + name).style.display = 'block';
+  if (user){
+    var p = loadPrefs(user.code);
+    p.adminTab = name;
+    savePrefs(user.code, p);
+  }
 }
 </script>
 </body>
