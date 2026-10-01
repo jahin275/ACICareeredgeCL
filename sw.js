@@ -8,7 +8,6 @@ const PRECACHE = [
   './index.html',
   './team.html',
   './admin.html',
-  './users.js',
   './favicon.png',
   './LOGO.png',
   './1.png','./2.png','./3.png','./4.png',
