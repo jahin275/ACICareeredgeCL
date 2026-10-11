@@ -40,20 +40,15 @@ self.addEventListener('fetch', function(e){
   var url;
   try { url = new URL(req.url); } catch (err){ return; }
 
-  /* Never cache the Apps Script API */
   if (url.hostname.indexOf('script.google.com') >= 0) return;
-  /* Cross-origin: only allow Google Fonts */
   if (url.origin !== location.origin && url.hostname.indexOf('fonts.') === -1) return;
 
   var path = url.pathname;
-
-  /* Extensionless navigation (/team, /admin, /index) → map to .html */
   var isExtensionless = path !== '/' && !/\.[a-z0-9]+$/i.test(path);
 
   e.respondWith(
     caches.match(req).then(function(cached){
       if (cached){
-        /* Serve cached + refresh in background */
         fetch(req).then(function(res){
           if (res && res.ok){
             caches.open(CACHE).then(function(c){ c.put(req, res.clone()); });
@@ -62,7 +57,6 @@ self.addEventListener('fetch', function(e){
         return cached;
       }
 
-      /* Try .html fallback for extensionless paths */
       if (isExtensionless){
         return caches.match(path + '.html').then(function(hc){
           if (hc){
