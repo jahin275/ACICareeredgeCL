@@ -70,7 +70,7 @@
   .lb-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
   .lb-search{flex:1 1 180px;margin-bottom:0;padding:10px 12px;font-size:.9em;}
   .lb-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:3px solid #000;border-radius:8px;background:#fff;}
-  table.lb{width:100%;border-collapse:collapse;font-size:.8em;background:#fff;min-width:640px;}
+  table.lb{width:100%;border-collapse:collapse;font-size:.78em;background:#fff;min-width:1050px;}
   table.lb th,table.lb td{padding:7px 8px;text-align:left;border-bottom:2px solid #eee;white-space:nowrap;}
   table.lb th{background:var(--dark);color:#fff;font-weight:800;font-size:.95em;}
   table.lb tbody tr.me{background:linear-gradient(90deg,#fff3cd,#ffe0b2);font-weight:800;}
@@ -108,13 +108,11 @@
     .card{padding:12px;}
     .btn-row .btn{flex:1 1 46%;min-height:46px;padding:12px 14px;font-size:.9em;}
     .team-dp{width:44px;height:44px;}
-    table.lb{font-size:.74em;min-width:600px;}
+    table.lb{font-size:.7em;min-width:940px;}
     table.lb th,table.lb td{padding:6px 6px;}
     .user-info span{max-width:80px;}
   }
-  @media(max-width:380px){
-    .brand-title{display:none;}
-  }
+  @media(max-width:380px){ .brand-title{display:none;} }
 </style>
 </head>
 <body>
@@ -246,9 +244,6 @@ function readSnapshot(){
     return obj.data;
   } catch(e){ return null; }
 }
-function writeSnapshot(data){
-  try { localStorage.setItem('aci_snapshot', JSON.stringify({ data: data, exp: Date.now() + 30*60*1000 })); } catch(e){}
-}
 function clearUserCache(){
   try {
     var keys = [];
@@ -269,7 +264,6 @@ function savePrefs(code, obj){
   try { localStorage.setItem('aci_prefs_' + code, JSON.stringify(obj)); } catch(e){}
 }
 
-/* ---------- SNAKE ---------- */
 var snakeGameId = 0;
 function showSnake(){ snakeGameId++; var id = snakeGameId; $('snakeOverlay').classList.add('show'); startSnake(id); }
 function hideSnake(){ snakeGameId++; $('snakeOverlay').classList.remove('show'); }
@@ -360,7 +354,6 @@ function startSnake(myId){
   placeFood(); draw();
 }
 
-/* ---------- API ---------- */
 function api(action, payload){
   payload = payload || {};
   payload.secret = API_SECRET;
@@ -397,14 +390,10 @@ function withSnake(fn, silent){
   }
   return Promise.resolve().then(fn).finally(function(){
     if (timer) clearTimeout(timer);
-    if (snakeShown){
-      snakeShown = false;
-      setTimeout(hideSnake, 180);
-    }
+    if (snakeShown){ snakeShown = false; setTimeout(hideSnake, 180); }
   });
 }
 
-/* ---------- LEADERBOARD ---------- */
 var indData = null, teamData = null;
 var indSort = {key:'points', dir:-1};
 var teamSort = {key:'points', dir:-1};
@@ -413,7 +402,10 @@ var LB_COLS = [
   {k:'minutes', l:'Min',   t:'Working Minutes'},
   {k:'promos',  l:'Promo', t:'Promotional Posts'},
   {k:'apps',    l:'App',   t:'Successful Applications'},
-  {k:'content', l:'Cont',  t:'Approved Content (Copy+Static+Blog+Video)'},
+  {k:'copy',    l:'Cpy',   t:'Approved Copy Content'},
+  {k:'stat',    l:'Stc',   t:'Approved Static Content'},
+  {k:'blog',    l:'Blg',   t:'Approved Blog Content'},
+  {k:'video',   l:'Vid',   t:'Approved Video Content'},
   {k:'regs',    l:'Reg',   t:'Successful Registrations'},
   {k:'present', l:'Att',   t:'Attendance (days present)'},
   {k:'points',  l:'Pts',   t:'Total Points'}
@@ -464,7 +456,10 @@ function paintIndTable(){
       '<td>' + (r.minutes || 0) + '</td>' +
       '<td>' + (r.promos  || 0) + '</td>' +
       '<td>' + (r.apps    || 0) + '</td>' +
-      '<td>' + (r.content || 0) + '</td>' +
+      '<td>' + (r.copy    || 0) + '</td>' +
+      '<td>' + (r.stat    || 0) + '</td>' +
+      '<td>' + (r.blog    || 0) + '</td>' +
+      '<td>' + (r.video   || 0) + '</td>' +
       '<td>' + (r.regs    || 0) + '</td>' +
       '<td>' + (r.present || 0) + '</td>' +
       '<td><strong>' + (r.points || 0) + '</strong></td>' +
@@ -496,7 +491,10 @@ function paintTeamTable(){
       '<td>' + (r.minutes || 0) + '</td>' +
       '<td>' + (r.promos  || 0) + '</td>' +
       '<td>' + (r.apps    || 0) + '</td>' +
-      '<td>' + (r.content || 0) + '</td>' +
+      '<td>' + (r.copy    || 0) + '</td>' +
+      '<td>' + (r.stat    || 0) + '</td>' +
+      '<td>' + (r.blog    || 0) + '</td>' +
+      '<td>' + (r.video   || 0) + '</td>' +
       '<td>' + (r.regs    || 0) + '</td>' +
       '<td>' + (r.present || 0) + '</td>' +
       '<td><strong>' + (r.points || 0) + '</strong></td>' +
@@ -534,7 +532,6 @@ document.addEventListener('click', function(e){
   var f2 = $('teamFilter'); if (f2) f2.addEventListener('input', function(){ paintTeamTable(); persistIndexPrefs(); });
 })();
 
-/* ---------- SNAPSHOT APPLIER ---------- */
 function applySnapshot(snap){
   if (!snap) return;
   if (snap.months){
@@ -555,7 +552,6 @@ function applySnapshot(snap){
 }
 window.applySnapshot = applySnapshot;
 
-/* ---------- LOGIN ---------- */
 function handleLogin(btn){
   var email = $('loginEmail').value.trim().toLowerCase();
   var code  = $('loginCode').value.trim().toUpperCase();
