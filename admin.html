@@ -320,7 +320,6 @@ function logout(){
   location.href = '/';
 }
 
-/* ---------- SORT STATE ---------- */
 var sortState = {
   teams:   {key:'month', dir:-1},
   top:     {key:'month', dir:-1},
@@ -358,7 +357,6 @@ document.addEventListener('click', function(e){
   }
 });
 
-/* ---------- BOOT ---------- */
 window.addEventListener('load', function(){
   var saved = localStorage.getItem('aci_user');
   if (!saved){ location.href = '/'; return; }
@@ -401,8 +399,8 @@ function applySnapshotAdmin(snap){
       present: u.present || 0, absent: 0,
       minutes: u.minutes || 0, promos: u.promos || 0,
       apps: u.apps || 0, regs: u.regs || 0,
-      content: u.content || 0,
-      copy: 0, stat: 0, blog: 0, video: 0
+      copy: u.copy || 0, stat: u.stat || 0, blog: u.blog || 0, video: u.video || 0,
+      content: u.content || 0
     });
   }
 
@@ -447,7 +445,6 @@ function applySnapshotAdmin(snap){
 }
 window.applySnapshotAdmin = applySnapshotAdmin;
 
-/* ---------- TEAMS TABLE ---------- */
 function paintTeamsHeader(){
   $('teamsHead').innerHTML =
     th('teams','teamNumber','#','Team number') +
@@ -487,7 +484,6 @@ function renderTeams(){
   $('teamsBody').innerHTML = p.join('') || '<tr><td colspan="8" class="empty">No teams.</td></tr>';
 }
 
-/* ---------- TOP 10 TABLE ---------- */
 function paintTopHeader(){
   $('topHead').innerHTML =
     th('top','rank','#','Position') +
@@ -521,7 +517,6 @@ function renderTop(){
   $('topBody').innerHTML = p.join('') || '<tr><td colspan="6" class="empty">No scores.</td></tr>';
 }
 
-/* ---------- ENTRIES TABLE ---------- */
 function paintEntriesHeader(){
   $('entriesHead').innerHTML =
     th('entries','date','Date') +
@@ -609,7 +604,6 @@ function populateTeamFilter(teams){
   sel.innerHTML = opts;
 }
 
-/* ---------- USERS TABLE ---------- */
 function paintUsersHeader(){
   $('usersHead').innerHTML =
     th('users','rank','#','Position') +
@@ -662,7 +656,6 @@ function renderUsers(){
   $('usersBody').innerHTML = p.join('');
 }
 
-/* ---------- GLOBAL ---------- */
 function paintAnnouncements(list){
   if (!list || !list.length){ $('annList').innerHTML = '<p class="empty">No announcements yet.</p>'; return; }
   var p = [];
