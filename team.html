@@ -94,7 +94,7 @@
     font-weight:800;font-size:.85em;box-shadow:2px 2px 0 #000;cursor:pointer;touch-action:manipulation;min-height:44px;}
   .switch button.active{background:var(--dark);color:#fff;}
   .lb-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:3px solid #000;border-radius:8px;background:#fff;margin-top:10px;}
-  table.lb{width:100%;border-collapse:collapse;font-size:.78em;background:#fff;min-width:720px;}
+  table.lb{width:100%;border-collapse:collapse;font-size:.76em;background:#fff;min-width:1050px;}
   table.lb th,table.lb td{padding:7px 8px;text-align:left;border-bottom:2px solid #eee;white-space:nowrap;}
   table.lb th{background:var(--dark);color:#fff;font-weight:800;font-size:.85em;}
   table.lb tbody tr.me{background:linear-gradient(90deg,#fff3cd,#ffe0b2);font-weight:800;}
@@ -126,7 +126,7 @@
     .grid2{grid-template-columns:1fr;}
     .team-dp{width:48px;height:48px;}
     .summary-grid{grid-template-columns:repeat(2,1fr);}
-    table.lb{font-size:.72em;min-width:640px;}
+    table.lb{font-size:.7em;min-width:920px;}
     table.lb th,table.lb td{padding:6px 6px;}
     .user-info span{max-width:80px;}
   }
@@ -284,7 +284,6 @@ function savePrefs(code, obj){
   try { localStorage.setItem('aci_prefs_' + code, JSON.stringify(obj)); } catch(e){}
 }
 
-/* ---------- SNAKE ---------- */
 var snakeGameId = 0;
 function showSnake(){ snakeGameId++; var id = snakeGameId; $('snakeOverlay').classList.add('show'); startSnake(id); }
 function hideSnake(){ snakeGameId++; $('snakeOverlay').classList.remove('show'); }
@@ -375,7 +374,6 @@ function startSnake(myId){
   placeFood(); draw();
 }
 
-/* ---------- API ---------- */
 function api(action, payload){
   payload = payload || {};
   payload.secret = API_SECRET;
@@ -421,10 +419,7 @@ function withSnake(fn, silent){
   }
   return Promise.resolve().then(fn).finally(function(){
     if (timer) clearTimeout(timer);
-    if (snakeShown){
-      snakeShown = false;
-      setTimeout(hideSnake, 180);
-    }
+    if (snakeShown){ snakeShown = false; setTimeout(hideSnake, 180); }
   });
 }
 function logout(){
@@ -451,8 +446,6 @@ function digitsOnly(el){
   });
   el.addEventListener('drop', function(e){ e.preventDefault(); });
 }
-
-/* ---------- PILLS + POINTS ---------- */
 function pillSet(x){
   var h = '';
   h += '<span class="pill ' + (x.attendance === 'Absent' ? 'absent' : 'present') + '">' + esc(x.attendance) + '</span>';
@@ -677,8 +670,11 @@ var SUMMARY_COLS = [
   {k:'overallRank', l:'Overall'},
   {k:'minutes',     l:'Min'},
   {k:'promos',      l:'Promo'},
-  {k:'content',     l:'Cont'},
   {k:'apps',        l:'App'},
+  {k:'copy',        l:'Cpy'},
+  {k:'stat',        l:'Stc'},
+  {k:'blog',        l:'Blg'},
+  {k:'video',       l:'Vid'},
   {k:'regs',        l:'Reg'},
   {k:'present',     l:'Att (P/A)'},
   {k:'month',       l:'Month'},
@@ -737,8 +733,11 @@ function renderSummary(r){
       '<td>' + (m.overallRank ? '#' + m.overallRank : '—') + '</td>' +
       '<td>' + (m.minutes || 0) + '</td>' +
       '<td>' + (m.promos  || 0) + '</td>' +
-      '<td>' + (m.content || 0) + '</td>' +
       '<td>' + (m.apps    || 0) + '</td>' +
+      '<td>' + (m.copy    || 0) + '</td>' +
+      '<td>' + (m.stat    || 0) + '</td>' +
+      '<td>' + (m.blog    || 0) + '</td>' +
+      '<td>' + (m.video   || 0) + '</td>' +
       '<td>' + (m.regs    || 0) + '</td>' +
       '<td>' + (m.present || 0) + ' / ' + (m.absent || 0) + '</td>' +
       '<td><strong>' + (m.month || 0) + '</strong></td>' +
